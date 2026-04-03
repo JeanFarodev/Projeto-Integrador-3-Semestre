@@ -1,0 +1,11 @@
+### 1. Cadastrar uma Receita (Entrada de Dinheiro)
+GET http://localhost:8080/contabilidade/novo?desc=Venda_Software&valor=10000&tipo=receita
+
+### 2. Cadastrar uma Despesa (Gasto)
+GET http://localhost:8080/contabilidade/novo?desc=Servidor_AWS&valor=2000&tipo=despesa
+
+### 3. Ver Fechamento no SIMPLES NACIONAL (6% sobre o faturamento total)
+GET http://localhost:8080/contabilidade/fechamento?regime=SIMPLES
+
+### 4. Ver Fechamento no LUCRO REAL (15% sobre o que sobrou)
+GET http://localhost:8080/contabilidade/fechamento?regime=LUCRO_REAL
