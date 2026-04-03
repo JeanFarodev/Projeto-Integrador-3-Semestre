@@ -1,8 +1,12 @@
 package Pi.demo;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Lancamento {
@@ -12,7 +16,7 @@ public class Lancamento {
 
     private String descricao;
     
-    // BigDecimal é o padrão ouro para dinheiro (evita erros de centavos)
+    
     private BigDecimal valor;
 
     private LocalDate data;

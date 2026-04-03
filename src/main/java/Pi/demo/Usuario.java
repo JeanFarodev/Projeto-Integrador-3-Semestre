@@ -6,22 +6,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity // Define que esta classe é uma tabela no banco de dados
-@Table(name = "usuarios_projeto") // Opcional: define o nome da tabela no MySQL
+@Entity 
+@Table(name = "usuarios_projeto") 
 public class Usuario {
 
-    @Id // Define que este atributo é a Chave Primária (PK)
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Define o Auto-Incremento
-    private Long id;
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)     private Long id;
 
     private String nome;
     private String email;
 
-    // Construtor vazio (obrigatório para o Hibernate)
+   
     public Usuario() {
     }
 
-    // Getters e Setters (Essenciais para o Spring ler e gravar os dados)
+    
     public Long getId() {
         return id;
     }
