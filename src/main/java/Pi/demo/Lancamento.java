@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Lancamento {
@@ -15,14 +16,13 @@ public class Lancamento {
     private Long id;
 
     private String descricao;
-    
-    
     private BigDecimal valor;
-
     private LocalDate data;
 
-    // "RECEITA" para entrada, "DESPESA" para saída
-    private String tipo;
+    // O segredo está aqui: tiramos o "String tipo" e "String categoria" 
+    // e usamos a categoria inteligente que já sabe o tipo dela.
+    @ManyToOne
+    private Categoria categoria;
 
     // Getters e Setters
     public Long getId() { return id; }
@@ -33,6 +33,6 @@ public class Lancamento {
     public void setValor(BigDecimal valor) { this.valor = valor; }
     public LocalDate getData() { return data; }
     public void setData(LocalDate data) { this.data = data; }
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
+    public Categoria getCategoria() { return categoria; }
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
 }
