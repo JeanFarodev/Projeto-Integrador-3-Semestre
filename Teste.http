@@ -1,0 +1,67 @@
+### =========================================================================
+### PASSO 1: CADASTRO DE CATEGORIAS (O "Cérebro" do sistema)
+### Faça isso primeiro para o sistema saber o que é Receita e o que é Despesa.
+### =========================================================================
+
+### 1.1 Cadastrar Categoria de Receita
+GET http://localhost:8080/categorias/novo?nome=VENDAS&tipo=RECEITA
+
+### 1.2 Cadastrar Categoria de Despesa Fixa
+GET http://localhost:8080/categorias/novo?nome=CONTAS_FIXAS&tipo=DESPESA
+
+### 1.3 Ver a lista de categorias e anotar os IDs (Geralmente 1 e 2)
+GET http://localhost:8080/categorias/lista
+
+
+### =========================================================================
+### PASSO 2: LANÇAMENTOS (Usando os IDs das categorias acima)
+### =========================================================================
+
+### 2.1 Cadastrar uma Venda (Use o ID da categoria VENDAS, ex: 1)
+GET http://localhost:8080/contabilidade/novo?desc=Venda_Software&valor=200000&categoriaId=1
+
+### 2.2 Cadastrar uma Despesa (Use o ID da categoria CONTAS_FIXAS, ex: 2)
+GET http://localhost:8080/contabilidade/novo?desc=Servidor_AWS&valor=2000&categoriaId=2
+
+
+### =========================================================================
+### PASSO 3: RELATÓRIOS E FECHAMENTOS (Cálculo de Impostos)
+### =========================================================================
+
+### 3.1 Ver Fechamento no SIMPLES NACIONAL (6% sobre as entradas)
+GET http://localhost:8080/contabilidade/fechamento?regime=SIMPLES
+
+### 3.2 Ver Fechamento no LUCRO REAL (15% sobre o lucro líquido)
+GET http://localhost:8080/contabilidade/fechamento?regime=LUCRO_REAL
+
+### 3.3 Ver Saldo Geral (Líquido)
+GET http://localhost:8080/contabilidade/saldo
+
+
+### =========================================================================
+### PASSO 4: MANUTENÇÃO (Editar e Deletar)
+### =========================================================================
+
+### 4.1 Listar todos os lançamentos para ver os IDs
+GET http://localhost:8080/contabilidade/lista
+
+### 4.2 Editar um valor (Troque o id= pelo que você viu na lista)
+GET http://localhost:8080/contabilidade/editar?id=1&valor=187000.67
+
+### 4.3 Deletar um lançamento errado (Troque o id=)
+GET http://localhost:8080/contabilidade/deletar?id=8
+
+
+### Ver resumo de gastos e ganhos por categoria
+GET http://localhost:8080/contabilidade/resumo
+
+### Ver todos os logs de auditoria (Quem fez o quê)
+GET http://localhost:8080/contabilidade/logs
+
+
+### =========================================================================
+### PASSO 5: EXPORTAÇÃO (Documento Oficial)
+### =========================================================================
+
+### Gerar Relatório em PDF
+GET http://localhost:8080/contabilidade/pdf
