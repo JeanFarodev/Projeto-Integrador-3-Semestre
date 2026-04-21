@@ -33,9 +33,10 @@ public class LancamentoController {
 
 
     @GetMapping("/novo")
-    public String salvar(@RequestParam String desc, @RequestParam BigDecimal valor, @RequestParam Long categoriaId) {
+    public String salvar(@RequestParam String desc, @RequestParam BigDecimal valor, @RequestParam long categoriaId) {
         Optional<Categoria> cat = catRepository.findById(categoriaId);
-        if (cat.isPresent()) {
+      
+       if (cat.isPresent()) {
             Lancamento l = new Lancamento();
             l.setDescricao(desc);
             l.setValor(valor);

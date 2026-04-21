@@ -4,10 +4,10 @@
 ### =========================================================================
 
 ### 1.1 Cadastrar Categoria de Receita
-GET http://localhost:8080/categorias/novo?nome=VENDAS&tipo=RECEITA
+GET http://localhost:8080/categorias/novo?nome=BONUStipo=RECEITA
 
 ### 1.2 Cadastrar Categoria de Despesa Fixa
-GET http://localhost:8080/categorias/novo?nome=CONTAS_FIXAS&tipo=DESPESA
+GET http://localhost:8080/categorias/novo?nome=SUPERMERCADO&tipo=DESPESA
 
 ### 1.3 Ver a lista de categorias e anotar os IDs (Geralmente 1 e 2)
 GET http://localhost:8080/categorias/lista
@@ -18,7 +18,7 @@ GET http://localhost:8080/categorias/lista
 ### =========================================================================
 
 ### 2.1 Cadastrar uma Venda (Use o ID da categoria VENDAS, ex: 1)
-GET http://localhost:8080/contabilidade/novo?desc=Venda_Software&valor=200000&categoriaId=1
+GET http://localhost:8080/contabilidade/novo?desc=SALARIO_2&valor=6000&categoriaId=7
 
 ### 2.2 Cadastrar uma Despesa (Use o ID da categoria CONTAS_FIXAS, ex: 2)
 GET http://localhost:8080/contabilidade/novo?desc=Servidor_AWS&valor=2000&categoriaId=2
