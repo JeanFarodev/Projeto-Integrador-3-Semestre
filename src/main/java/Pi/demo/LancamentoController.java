@@ -75,6 +75,7 @@ public class LancamentoController {
             document.add(new Paragraph("\n"));
 
             List<Lancamento> todos = repository.findAll();
+            String tipoDeTributo = "";
             
             // Cálculos de Fluxo
             BigDecimal totalReceitas = todos.stream()
@@ -105,9 +106,12 @@ public class LancamentoController {
             
             // Projeção de Impostos
             document.add(new Paragraph("\nPROJEÇÃO TRIBUTÁRIA").setBold().setUnderline());
-            document.add(new Paragraph("• Simples Nacional (6%): R$ " + totalReceitas.multiply(new BigDecimal("0.06"))));
-            document.add(new Paragraph("• Lucro Real (15%): R$ " + (saldoCaixa.signum() > 0 ? saldoCaixa.multiply(new BigDecimal("0.15")) : "0.00")));
 
+            if(tipoDeTributo == "Simples Nacional"){ document.add(new Paragraph("• Simples Nacional (6%): R$ " + totalReceitas.multiply(new BigDecimal("0.06")))); }
+
+           else if ( tipoDeTributo == "Lucro Real" ){document.add(new Paragraph("• Lucro Real (15%): R$ " + (saldoCaixa.signum() > 0 ? saldoCaixa.multiply(new BigDecimal("0.15")) : "0.00")));
+}
+            
             return "PDF Gerencial gerado com sucesso!";
 
         } catch (Exception e) {

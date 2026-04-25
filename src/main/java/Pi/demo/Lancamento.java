@@ -19,8 +19,7 @@ public class Lancamento {
     private BigDecimal valor;
     private LocalDate data;
 
-    // O segredo está aqui: tiramos o "String tipo" e "String categoria" 
-    // e usamos a categoria inteligente que já sabe o tipo dela.
+    
     @ManyToOne
     private Categoria categoria;
 
