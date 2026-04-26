@@ -1,67 +1,61 @@
 ### =========================================================================
-### PASSO 1: CADASTRO DE CATEGORIAS (O "Cérebro" do sistema)
-### Faça isso primeiro para o sistema saber o que é Receita e o que é Despesa.
+### PROJETO INTEGRADOR - SISTEMA CONTÁBIL (TAKUMI)
+### Credenciais: vinicius@email.com / 123
 ### =========================================================================
 
-### 1.1 Cadastrar Categoria de Receita
-GET http://localhost:8080/categorias/novo?nome=BONUStipo=RECEITA
-
-### 1.2 Cadastrar Categoria de Despesa Fixa
-GET http://localhost:8080/categorias/novo?nome=SUPERMERCADO&tipo=DESPESA
-
-### 1.3 Ver a lista de categorias e anotar os IDs (Geralmente 1 e 2)
-GET http://localhost:8080/categorias/lista
-
+### 1. CADASTRO DA EMPRESA
+# @name cadastrarEmpresa
+POST http://localhost:8080/contabilidade/empresa/nova?nome=Takumi_Restaurante&doc=12.345.678/0001-99&tipo=PJ&regime=SIMPLES_NACIONAL
+Authorization: Basic vinicius@email.com 123
 
 ### =========================================================================
-### PASSO 2: LANÇAMENTOS (Usando os IDs das categorias acima)
+### 2. CATEGORIAS
 ### =========================================================================
 
-### 2.1 Cadastrar uma Venda (Use o ID da categoria VENDAS, ex: 1)
-GET http://localhost:8080/contabilidade/novo?desc=SALARIO_2&valor=6000&categoriaId=7
+### 2.1 Cadastrar Categoria de Receita
+GET http://localhost:8080/categorias/novo?nome=VENDAScomData&tipo=RECEITA
+Authorization: Basic vinicius@email.com 123
 
-### 2.2 Cadastrar uma Despesa (Use o ID da categoria CONTAS_FIXAS, ex: 2)
-GET http://localhost:8080/contabilidade/novo?desc=Servidor_AWS&valor=2000&categoriaId=2
-
+### 2.2 Cadastrar Categoria de Despesa
+GET http://localhost:8080/categorias/novo?nome=OPERACIONAL&tipo=DESPESA
+Authorization: Basic vinicius@email.com 123
 
 ### =========================================================================
-### PASSO 3: RELATÓRIOS E FECHAMENTOS (Cálculo de Impostos)
+### 3. LANÇAMENTOS
 ### =========================================================================
 
-### 3.1 Ver Fechamento no SIMPLES NACIONAL (6% sobre as entradas)
-GET http://localhost:8080/contabilidade/fechamento?regime=SIMPLES
+### 3.1 Cadastrar uma Receita (Venda de Sushi)
+GET http://localhost:8080/contabilidade/novo?desc=Venda_Sushi_Semana_1&valor=5000&categoriaId=1
+Authorization: Basic vinicius@email.com 123
 
-### 3.2 Ver Fechamento no LUCRO REAL (15% sobre o lucro líquido)
-GET http://localhost:8080/contabilidade/fechamento?regime=LUCRO_REAL
+### 3.2 Cadastrar uma Despesa (Insumos/Peixes)
+GET http://localhost:8080/contabilidade/novo?desc=Compra_Salmao&valor=1500&categoriaId=2
+Authorization: Basic vinicius@email.com 123
 
-### 3.3 Ver Saldo Geral (Líquido)
+### =========================================================================
+### 4. RELATÓRIOS, DASHBOARD E PDF
+### =========================================================================
+
+### 4.1 Ver Saldo Geral (Líquido)
 GET http://localhost:8080/contabilidade/saldo
+Authorization: Basic vinicius@email.com 123
 
+### 4.2 GERAR RELATÓRIO PDF (Documento Executivo)
+GET http://localhost:8080/contabilidade/pdf?empresaId=1
+Authorization: Basic vinicius@email.com 123
+
+### 4.3 ACESSAR DASHBOARD JSON (Dados para o Front-end)
+GET http://localhost:8080/contabilidade/dashboard?empresaId=1
+Authorization: Basic vinicius@email.com 123
 
 ### =========================================================================
-### PASSO 4: MANUTENÇÃO (Editar e Deletar)
+### 5. MANUTENÇÃO
 ### =========================================================================
 
-### 4.1 Listar todos os lançamentos para ver os IDs
+### 5.1 Listar todos os lançamentos
 GET http://localhost:8080/contabilidade/lista
+Authorization: Basic vinicius@email.com 123
 
-### 4.2 Editar um valor (Troque o id= pelo que você viu na lista)
-GET http://localhost:8080/contabilidade/editar?id=1&valor=187000.67
-
-### 4.3 Deletar um lançamento errado (Troque o id=)
-GET http://localhost:8080/contabilidade/deletar?id=8
-
-
-### Ver resumo de gastos e ganhos por categoria
-GET http://localhost:8080/contabilidade/resumo
-
-### Ver todos os logs de auditoria (Quem fez o quê)
-GET http://localhost:8080/contabilidade/logs
-
-
-### =========================================================================
-### PASSO 5: EXPORTAÇÃO (Documento Oficial)
-### =========================================================================
-
-### Gerar Relatório em PDF
-GET http://localhost:8080/contabilidade/pdf
+### 5.2 Deletar um lançamento (Exemplo ID 1)
+GET http://localhost:8080/contabilidade/deletar?id=1
+Authorization: Basic vinicius@email.com 123

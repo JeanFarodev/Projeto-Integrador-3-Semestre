@@ -1,56 +1,41 @@
 package Pi.demo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity 
 @Table(name = "usuarios_projeto") 
 public class Usuario {
 
     @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)     private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String nome;
-    private String email;
-    private String senha ;
 
-   
+    @Column(unique = true, nullable = false) // Garante que o e-mail seja único e obrigatório
+    private String email;
+
+    @Column(nullable = false)
+    private String senha;
+
+    private String tipoUsuario; // EX: "ADMIN" ou "USER"
+    
     public Usuario() {
     }
 
-    
-    public Long getId() {
-        return id;
-    }
+    // Getters e Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void getSenha (){
-        return senha ;
-}
-
-    public String setSenha(){
-         this.senha = senha ;
-    }
+    public String getTipoUsuario() { return tipoUsuario; }
+    public void setTipoUsuario(String tipoUsuario) { this.tipoUsuario = tipoUsuario; }
 }
