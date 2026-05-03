@@ -4,191 +4,244 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestão de Caixa</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-   <link rel="stylesheet" th:href="@{/style.css?v=2}">
+    <!-- Tailwind CSS (via CDN para facilitar) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body>
+<body class="bg-[#101c3d] flex items-center justify-center min-h-screen p-4 text-slate-800">
 
-    <div class="app-container">
-        <header class="top-header">
-            <div class="header-logo">
-                <i class='bx bx-laptop'></i>
+    <!-- Container Principal do App -->
+    <div class="w-full max-w-[1400px] h-[94vh] bg-[#f4f6f9] rounded-xl overflow-hidden flex flex-col shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
+        
+        <!-- Header -->
+        <header class="bg-[#214b98] text-white py-4 px-8 flex justify-between items-center">
+            <div class="flex items-center gap-2 text-lg font-semibold">
+                <i class='bx bx-laptop text-xl'></i>
                 <span>Sistema de Gestão de Caixa</span>
             </div>
-            <div class="header-actions">
-                <i class='bx bxs-bell'></i>
-                <i class='bx bx-dots-vertical-rounded'></i>
-                <i class='bx bx-credit-card-front'></i>
-                <div class="user-avatar-small"><i class='bx bxs-user-circle'></i></div>
-                <i class='bx bx-menu'></i>
+            <div class="flex items-center gap-4 text-xl">
+                <i class='bx bxs-bell cursor-pointer hover:text-slate-200 transition'></i>
+                <i class='bx bx-dots-vertical-rounded cursor-pointer hover:text-slate-200 transition'></i>
+                <i class='bx bx-credit-card-front cursor-pointer hover:text-slate-200 transition'></i>
+                <div class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full cursor-pointer hover:bg-white/30 transition">
+                    <i class='bx bxs-user-circle'></i>
+                </div>
+                <i class='bx bx-menu cursor-pointer hover:text-slate-200 transition'></i>
             </div>
         </header>
 
-        <div class="main-wrapper">
-            <aside class="sidebar">
-                <nav class="sidebar-nav">
-                    <ul>
-                        <li class="active"><a href="#"><i class='bx bxs-right-arrow-circle'></i> Dashboard</a></li>
-                        <li><a href="#"><i class='bx bx-plus-medical'></i> Movimentações</a></li>
-                        <li><a href="#"><i class='bx bx-briefcase'></i> Fechamento de Caixa</a></li>
-                        <li><a href="#"><i class='bx bx-envelope'></i> Relatórios</a></li>
-                        <li><a href="#"><i class='bx bxs-user'></i> Produtos</a></li>
-                        <li><a href="#"><i class='bx bx-cog'></i> Configurações</a></li>
+        <!-- Main Wrapper (Sidebar + Content) -->
+        <div class="flex flex-1 overflow-hidden">
+            
+            <!-- Sidebar -->
+            <aside class="w-[250px] bg-white flex flex-col justify-between border-r border-slate-200 shrink-0">
+                <nav class="p-5">
+                    <ul class="flex flex-col gap-2">
+                        <li>
+                            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white font-medium text-sm transition-colors">
+                                <i class='bx bxs-right-arrow-circle text-lg'></i> Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-100 font-medium text-sm transition-colors">
+                                <i class='bx bx-plus-medical text-lg'></i> Movimentações
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-100 font-medium text-sm transition-colors">
+                                <i class='bx bx-briefcase text-lg'></i> Fechamento de Caixa
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-100 font-medium text-sm transition-colors">
+                                <i class='bx bx-envelope text-lg'></i> Relatórios
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-100 font-medium text-sm transition-colors">
+                                <i class='bx bxs-user text-lg'></i> Produtos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-100 font-medium text-sm transition-colors">
+                                <i class='bx bx-cog text-lg'></i> Configurações
+                            </a>
+                        </li>
                     </ul>
                 </nav>
-                <div class="user-profile">
-                    <img th:src="@{/img/avatar.jpg}" alt="Ana Silva">
-                    <div class="user-info">
-                        <span class="user-name" th:text="${usuario.nome}">Ana Silva</span>
-                        <span class="user-role" th:text="${usuario.cargo}">Gerente | Loja Centro</span>
+                <!-- Perfil do Usuário na Sidebar -->
+                <div class="p-5 flex items-center gap-3 bg-slate-50 border-t border-slate-200">
+                    <img th:src="@{/img/avatar.jpg}" alt="Ana Silva" class="w-10 h-10 rounded-full object-cover">
+                    <div class="flex flex-col">
+                        <span class="font-semibold text-sm text-slate-800" th:text="${usuario.nome}">Ana Silva</span>
+                        <span class="text-xs text-slate-500" th:text="${usuario.cargo}">Gerente | Loja Centro</span>
                     </div>
                 </div>
             </aside>
 
-            <main class="content-area">
+            <!-- Área de Conteúdo -->
+            <main class="flex-1 p-6 overflow-y-auto flex flex-col gap-6">
                 
-                <section class="cards-grid">
-                    <div class="card">
-                        <small>Saldo Atual</small>
-                        <h2 th:text="'R$ ' + ${#numbers.formatDecimal(saldoAtual, 1, 'POINT', 2, 'COMMA')}">R$ 5.320,00</h2>
+                <!-- Cards Superiores -->
+                <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                    <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100">
+                        <small class="text-slate-500 font-semibold text-sm block mb-2">Saldo Atual</small>
+                        <h2 class="text-2xl font-bold text-slate-800" th:text="'R$ ' + ${#numbers.formatDecimal(saldoAtual, 1, 'POINT', 2, 'COMMA')}">R$ 5.320,00</h2>
                     </div>
-                    <div class="card card-green">
-                        <small>Entradas Hoje</small>
-                        <h2 th:text="'R$ ' + ${#numbers.formatDecimal(entradas, 1, 'POINT', 2, 'COMMA')}">R$ 2.450,00</h2>
+                    <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100">
+                        <small class="text-slate-500 font-semibold text-sm block mb-2">Entradas Hoje</small>
+                        <h2 class="text-2xl font-bold text-green-600" th:text="'R$ ' + ${#numbers.formatDecimal(entradas, 1, 'POINT', 2, 'COMMA')}">R$ 2.450,00</h2>
                     </div>
-                    <div class="card card-red">
-                        <small>Saídas Hoje</small>
-                        <h2 th:text="'R$ ' + ${#numbers.formatDecimal(saidas, 1, 'POINT', 2, 'COMMA')}">R$ 980,00</h2>
+                    <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100">
+                        <small class="text-slate-500 font-semibold text-sm block mb-2">Saídas Hoje</small>
+                        <h2 class="text-2xl font-bold text-red-600" th:text="'R$ ' + ${#numbers.formatDecimal(saidas, 1, 'POINT', 2, 'COMMA')}">R$ 980,00</h2>
                     </div>
-                    <div class="card">
-                        <small>Saldo Inicial</small>
-                        <h2 th:text="'R$ ' + ${#numbers.formatDecimal(saldoInicial, 1, 'POINT', 2, 'COMMA')}">R$ 3.850,00</h2>
+                    <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100">
+                        <small class="text-slate-500 font-semibold text-sm block mb-2">Saldo Inicial</small>
+                        <h2 class="text-2xl font-bold text-slate-800" th:text="'R$ ' + ${#numbers.formatDecimal(saldoInicial, 1, 'POINT', 2, 'COMMA')}">R$ 3.850,00</h2>
                     </div>
                 </section>
 
-                <section class="middle-grid">
-                    <div class="panel chart-panel">
-                        <div class="panel-header">
-                            <h3>Fluxo de Caixa</h3>
-                            <div class="chart-legend">
-                                <span class="legend-entry">Entradas</span>
-                                <span class="legend-exit">Saídas</span>
+                <!-- Grid do Meio (Gráfico e Resumo) -->
+                <section class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+                    
+                    <!-- Painel do Gráfico -->
+                    <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100 xl:col-span-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg text-slate-800 font-semibold">Fluxo de Caixa</h3>
+                            <div class="flex gap-4 text-sm text-slate-500">
+                                <span class="flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-sm bg-green-500 inline-block"></span>Entradas
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-sm bg-red-500 inline-block"></span>Saídas
+                                </span>
                             </div>
                         </div>
-                        <div class="chart-placeholder">[Gráfico de Linhas]</div>
+                        <div class="h-[180px] border border-dashed border-slate-300 flex items-center justify-center text-slate-400 rounded-lg bg-slate-50">
+                            [Gráfico de Linhas]
+                        </div>
                     </div>
                     
-                    <div class="panel summary-panel">
-                        <h3>Resumo do Caixa</h3>
-                        <ul class="summary-list">
-                            <li><span>Dinheiro em Caixa:</span> <strong>R$ 2.150,00</strong></li>
-                            <li><span>Cartões:</span> <strong>R$ 1.500,00</strong></li>
-                            <li><span>Pix:</span> <strong>R$ 720,00</strong></li>
-                            <hr>
-                            <li class="summary-total"><span>Total de Transações:</span> <strong>85</strong></li>
+                    <!-- Painel de Resumo -->
+                    <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100 xl:col-span-1">
+                        <h3 class="text-lg text-slate-800 font-semibold mb-4">Resumo do Caixa</h3>
+                        <ul class="flex flex-col gap-3">
+                            <li class="flex justify-between text-sm text-slate-700">
+                                <span>Dinheiro em Caixa:</span> <strong class="font-semibold text-slate-900">R$ 2.150,00</strong>
+                            </li>
+                            <li class="flex justify-between text-sm text-slate-700">
+                                <span>Cartões:</span> <strong class="font-semibold text-slate-900">R$ 1.500,00</strong>
+                            </li>
+                            <li class="flex justify-between text-sm text-slate-700">
+                                <span>Pix:</span> <strong class="font-semibold text-slate-900">R$ 720,00</strong>
+                            </li>
+                            <li><hr class="border-slate-200 my-1"></li>
+                            <li class="flex justify-between text-base text-slate-800">
+                                <span>Total de Transações:</span> <strong class="font-bold">85</strong>
+                            </li>
                         </ul>
                     </div>
                 </section>
 
-                <section class="bottom-grid">
-                    <div class="left-column">
-                        <div class="panel table-panel">
-                            <h3>Últimas Movimentações</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Tipo</th>
-                                        <th>Descrição</th>
-                                        <th>Valor</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="mov : ${movimentacoes}">
-                                        <td><span class="badge" th:classappend="${mov.valor >= 0 ? 'badge-blue' : 'badge-red'}" th:text="${mov.tipo}">Fechado</span></td>
-                                        <td th:text="${mov.descricao}">Venda de Produto</td>
-                                        <td th:classappend="${mov.valor >= 0 ? 'text-green' : 'text-red'}" th:text="${(mov.valor >= 0 ? '+ R$ ' : '- R$ ') + #numbers.formatDecimal(#numbers.abs(mov.valor), 1, 'POINT', 2, 'COMMA')}">+ R$ 450,00</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="panel-footer">
-                                <button class="btn-primary">Ver Tudo</button>
+                <!-- Grid Base (Tabelas) -->
+                <section class="grid grid-cols-1 xl:grid-cols-2 gap-5 pb-6">
+                    
+                    <!-- Coluna Esquerda -->
+                    <div class="flex flex-col gap-5">
+                        
+                        <!-- Tabela Movimentações -->
+                        <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100">
+                            <h3 class="text-lg text-slate-800 font-semibold mb-2">Últimas Movimentações</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse mt-2 min-w-[400px]">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-slate-500 font-medium py-3 px-2 border-b border-slate-100 text-sm">Tipo</th>
+                                            <th class="text-slate-500 font-medium py-3 px-2 border-b border-slate-100 text-sm">Descrição</th>
+                                            <th class="text-slate-500 font-medium py-3 px-2 border-b border-slate-100 text-sm">Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="mov : ${movimentacoes}">
+                                            <td class="py-3 px-2 border-b border-slate-50">
+                                                <span class="px-3 py-1 rounded-md text-xs text-white" 
+                                                      th:classappend="${mov.valor >= 0 ? 'bg-blue-600' : 'bg-red-500'}" 
+                                                      th:text="${mov.tipo}">Fechado</span>
+                                            </td>
+                                            <td class="py-3 px-2 border-b border-slate-50 text-slate-800 font-medium text-sm" 
+                                                th:text="${mov.descricao}">Venda de Produto</td>
+                                            <td class="py-3 px-2 border-b border-slate-50 font-medium text-sm" 
+                                                th:classappend="${mov.valor >= 0 ? 'text-green-600' : 'text-red-600'}" 
+                                                th:text="${(mov.valor >= 0 ? '+ R$ ' : '- R$ ') + #numbers.formatDecimal(#numbers.abs(mov.valor), 1, 'POINT', 2, 'COMMA')}">
+                                                + R$ 450,00
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="flex justify-end pt-4">
+                                <button class="bg-blue-600 text-white px-5 py-2.5 rounded-md font-medium text-sm hover:bg-blue-700 transition">Ver Tudo</button>
                             </div>
                         </div>
                         
-                        <div class="panel profit-panel">
-                            <div class="profit-info">
-                                <i class='bx bx-money-withdraw'></i>
-                                <span>Lucro do Dia: <strong class="text-green">R$ 1.470,00</strong></span>
+                        <!-- Painel de Lucro -->
+                        <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100 flex justify-between items-center">
+                            <div class="flex items-center gap-3 text-lg font-semibold text-slate-800">
+                                <i class='bx bx-money-withdraw text-2xl text-green-600'></i>
+                                <span>Lucro do Dia: <strong class="text-green-600">R$ 1.470,00</strong></span>
                             </div>
-                            <button class="btn-primary">Ver Relatórios</button>
+                            <button class="bg-blue-600 text-white px-5 py-2.5 rounded-md font-medium text-sm hover:bg-blue-700 transition">Ver Relatórios</button>
                         </div>
                     </div>
 
-                    <div class="right-column">
-                        <div class="panel table-panel">
-                            <h3>Fechamento de Caixa</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Status</th>
-                                        <th>Total Fechamento</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="f : ${fechamentos}">
-                                        <td th:text="${f.data}">21/10/2021</td>
-                                        <td><span class="badge badge-green">Fechado</span></td>
-                                        <td th:text="${f.total}">R$ 5.200,00</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="panel-footer">
-                                <button class="btn-primary">Ver Relatórios</button>
+                    <!-- Coluna Direita -->
+                    <div class="flex flex-col gap-5">
+                        
+                        <!-- Tabela Fechamentos -->
+                        <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100">
+                            <h3 class="text-lg text-slate-800 font-semibold mb-2">Fechamento de Caixa</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse mt-2 min-w-[400px]">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-slate-500 font-medium py-3 px-2 border-b border-slate-100 text-sm">Data</th>
+                                            <th class="text-slate-500 font-medium py-3 px-2 border-b border-slate-100 text-sm">Status</th>
+                                            <th class="text-slate-500 font-medium py-3 px-2 border-b border-slate-100 text-sm">Total Fechamento</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="f : ${fechamentos}">
+                                            <td class="py-3 px-2 border-b border-slate-50 text-slate-800 font-medium text-sm" th:text="${f.data}">21/10/2021</td>
+                                            <td class="py-3 px-2 border-b border-slate-50">
+                                                <span class="px-3 py-1 rounded-md text-xs text-white bg-green-500">Fechado</span>
+                                            </td>
+                                            <td class="py-3 px-2 border-b border-slate-50 text-slate-800 font-medium text-sm" th:text="${f.total}">R$ 5.200,00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="flex justify-end pt-4">
+                                <button class="bg-blue-600 text-white px-5 py-2.5 rounded-md font-medium text-sm hover:bg-blue-700 transition">Ver Relatórios</button>
                             </div>
                         </div>
 
-                        <div class="alert-bar" th:if="${alertaCedulas}">
-                            <i class='bx bxs-error-alt text-orange'></i>
-                            <span><strong>Atenção:</strong> Baixo estoque de cédulas de R$ 10,00</span>
-                            <button class="btn-primary-dark">Ver Relatórios</button>
+                        <!-- Alerta de Cédulas -->
+                        <div class="bg-amber-100 border border-amber-200 p-4 rounded-xl flex justify-between items-center text-amber-800 text-sm shadow-sm" th:if="${alertaCedulas}">
+                            <div class="flex items-center gap-3">
+                                <i class='bx bxs-error-alt text-2xl text-orange-500'></i>
+                                <span><strong class="font-semibold text-amber-900">Atenção:</strong> Baixo estoque de cédulas de R$ 10,00</span>
+                            </div>
+                            <button class="bg-[#1e3a8a] text-white px-4 py-2 rounded-md font-medium text-sm hover:bg-blue-900 transition">Ver Relatórios</button>
                         </div>
                     </div>
                 </section>
-
-            </main>
-        </div>
-    </div>
-
-</body>
-  <body>
-    <div class="app-container">
-        
-        <header class="top-header">
-            <div class="header-logo">
-                <i class='bx bx-laptop'></i>
-                <span>Sistema de Gestão de Caixa</span>
-            </div>
-            </header>
-
-        <div class="main-wrapper">
-            
-            <aside class="sidebar"> ... </aside>
-
-            <main class="content-area">
-                
-                <div class="left-column">
-                    <div class="panel table-panel"> ... tabela de movimentações ... </div>
-                    
-                    <div class="panel profit-panel">
-                        <div class="profit-info">
-                            <i class='bx bx-money-withdraw'></i>
-                            <span>Lucro do Dia: <strong class="text-green">R$ 1.470,00</strong></span>
-                        </div>
-                        <button class="btn-primary">Ver Relatórios</button>
-                    </div>
-                </div>
 
             </main>
         </div>
