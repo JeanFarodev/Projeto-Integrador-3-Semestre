@@ -19,7 +19,7 @@
     <!-- Container Principal do App -->
     <div class="w-full max-w-[1400px] h-[94vh] bg-[#f4f6f9] rounded-xl overflow-hidden flex flex-col shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
         
-        <!-- Header -->
+        
         <header class="bg-[#214b98] text-white py-4 px-8 flex justify-between items-center">
             <div class="flex items-center gap-2 text-lg font-semibold">
                 <i class='bx bx-laptop text-xl'></i>
@@ -246,5 +246,12 @@
             </main>
         </div>
     </div>
+    <a th:href="@{/dashboard}" class="...">
+    <i class='bx bxs-right-arrow-circle text-lg'></i> Dashboard
+</a>
+
+<a th:href="@{/movimentacoes}" class="...">
+    <i class='bx bx-plus-medical text-lg'></i> Movimentações
+</a>
 </body>
 </html>
