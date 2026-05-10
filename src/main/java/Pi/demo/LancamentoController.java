@@ -51,28 +51,33 @@ public class LancamentoController {
         return "Empresa cadastrada com sucesso! ID: " + e.getId();
     }
 
-    @GetMapping("/novo")
-    public String salvar(@RequestParam String desc, @RequestParam BigDecimal valor, @RequestParam long categoriaId) {
-        Optional<Categoria> cat = catRepository.findById(categoriaId);
-        if (cat.isPresent()) {
-            Lancamento l = new Lancamento();
-            l.setDescricao(desc);
-            l.setValor(valor);
-            l.setCategoria(cat.get());
+   @GetMapping("/novo")
+public String salvar(@RequestParam String desc, 
+                     @RequestParam BigDecimal valor, 
+                     @RequestParam long categoriaId,
+                     @RequestParam long empresaId) { // Adicionamos aqui
+    
+    Optional<Categoria> cat = catRepository.findById(categoriaId);
+    Optional<Empresa> emp = empresaRepository.findById(empresaId);
 
-            // DEFINE A DATA ANTES DE SALVAR!
-            l.setData(LocalDate.now()); 
+    if (cat.isPresent() && emp.isPresent()) {
+        Lancamento l = new Lancamento();
+        l.setDescricao(desc);
+        l.setValor(valor);
+        l.setCategoria(cat.get());
+        l.setEmpresa(emp.get()); // CARIMBO: Vincula o lançamento à empresa
+        l.setData(LocalDate.now()); 
 
-            repository.save(l); // Agora o 'save' leva a data junto
-            return "Salvo: " + desc;
-        }
-        return "Erro: Categoria " + categoriaId + " não encontrada!";
+        repository.save(l);
+        return "Salvo para a empresa " + emp.get().getNome() + ": " + desc;
     }
+    return "Erro: Categoria ou Empresa não encontrada!";
+}
 
     // SALDO GERAL
     @GetMapping("/saldo")
-    public BigDecimal calcularSaldo() {
-        List<Lancamento> todos = repository.findAll();
+    public BigDecimal calcularSaldo(@RequestParam Long empresaId) {
+        List<Lancamento> todos = repository.findByEmpresaId(empresaId);
         BigDecimal saldo = BigDecimal.ZERO;
         for (Lancamento l : todos) {
             if (l.getCategoria() != null && l.getCategoria().getTipo() != null) {
@@ -116,7 +121,7 @@ public String gerarPdf(@RequestParam(defaultValue = "1") Long empresaId) {
         document.add(new Paragraph("Regime Tributário: " + empresa.getRegimeTributario() + " | Tipo: " + empresa.getTipoPessoa()).setFontSize(10));
         document.add(new Paragraph("\n"));
 
-        List<Lancamento> todos = repository.findAll();
+        List<Lancamento> todos = repository.findByEmpresaId(empresaId);
         
         // --- LISTAGEM DE LANÇAMENTOS (Estilo "2" - Detalhado) ---
         document.add(new Paragraph("DISCRIMINAÇÃO DOS LANÇAMENTOS").setBold().setFontSize(11));

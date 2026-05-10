@@ -5,6 +5,10 @@ import jakarta.persistence.*;
 @Entity
 public class Empresa {
 
+
+    @ManyToOne
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresa;
   
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
