@@ -1,6 +1,4 @@
-package Pi.demo;
-
-package com.seuprojeto.CaixaController; // MANTENHA A SUA PRIMEIRA LINHA AQUI (pode ser diferente desta)
+package Pi.demo; // MANTENHA A SUA PRIMEIRA LINHA AQUI (pode ser diferente desta)
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

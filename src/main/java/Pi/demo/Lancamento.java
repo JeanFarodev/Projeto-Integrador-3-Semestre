@@ -39,4 +39,6 @@ public class Lancamento {
     public void setData(LocalDate data) { this.data = data; }
     public Categoria getCategoria() { return categoria; }
     public void setCategoria(Categoria categoria) { this.categoria = categoria; }
+    public Empresa getEmpresa() { return empresa; }
+    public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
 }
