@@ -15,6 +15,7 @@ public class DemoApplication {
 
     // O Bean deve ficar fora do main, mas dentro da classe
     @Bean
+    @SuppressWarnings("unused")
     CommandLineRunner initDatabase(UsuarioRepository repository, PasswordEncoder passwordEncoder) {
         return args -> {
             // Verifica se o usuário já existe para não duplicar toda vez que ligar o PC

@@ -14,8 +14,8 @@ public class CaixaController {
     // 0. ROTA DE LOGIN (É a primeira tela a carregar no localhost:8080)
     @GetMapping({"/", "/login"})
     public String abrirLogin() {
-        return "login";
-    }
+    return "login"; // Precisa ser exatamente assim
+}
 
     // 1. ROTA DO DASHBOARD (Para onde o botão de login te manda)
     @GetMapping("/dashboard")
