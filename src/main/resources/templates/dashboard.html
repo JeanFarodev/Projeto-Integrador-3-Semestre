@@ -243,39 +243,45 @@
     <i class='bx bx-plus-medical text-lg'></i> Movimentações
 </a>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    async function carregarGrafico() {
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const empresaId = urlParams.get('empresaId') || '1';
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        async function carregarGrafico() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const empresaId = urlParams.get('empresaId') || '1';
 
-            const res = await fetch(`/contabilidade/api/dashboard-dados?empresaId=${empresaId}`);
-            const dados = await res.json();
+                const res = await fetch('/contabilidade/api/dashboard-dados?empresaId=' + empresaId);
+                const dados = await res.json();
 
-            const ctx = document.getElementById('graficoFluxoCaixa').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Receitas', 'Despesas'],
-                    datasets: [{
-                        label: 'Valores em R$',
-                        data: [dados.totalReceitas, dados.totalDespesas], 
-                        backgroundColor: ['#0aa958', '#dc3545'], 
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { beginAtZero: true }
+                const ctx = document.getElementById('graficoFluxoCaixa').getContext('2d');
+                
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Receitas', 'Despesas'],
+                        datasets: [{
+                            label: 'Valores em R$',
+                            data: [dados.totalReceitas, dados.totalDespesas],
+                            backgroundColor: ['#0aa958', '#dc3545'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
                     }
-                }
-            }); // Fecha o new Chart
-        } catch (error) {
-            console.error("Erro ao carregar o gráfico:", error);
-        } // Fecha o catch
-    } // Fecha a função carregarGrafico
+                });
+            } catch (error) {
+                console.error("Erro ao carregar o gráfico:", error);
+            }
+        }
 
-    document.addEventListener("DOMContentLoaded", carregarGrafico);
-</script> </body>
+        document.addEventListener("DOMContentLoaded", carregarGrafico);
+        /*]]>*/
+    </script>
+</body>
 </html>
