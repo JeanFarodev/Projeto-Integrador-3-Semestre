@@ -107,26 +107,15 @@
                         <h2 class="text-2xl font-bold text-slate-800" th:text="'R$ ' + ${#numbers.formatDecimal(saldoInicial, 1, 'POINT', 2, 'COMMA')}">R$ 3.850,00</h2>
                     </div>
                 </section>
+                
 
                 <!-- Grid do Meio (Gráfico e Resumo) -->
                 <section class="grid grid-cols-1 xl:grid-cols-3 gap-5">
                     
                     <!-- Painel do Gráfico -->
-                    <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100 xl:col-span-2">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg text-slate-800 font-semibold">Fluxo de Caixa</h3>
-                            <div class="flex gap-4 text-sm text-slate-500">
-                                <span class="flex items-center gap-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-sm bg-green-500 inline-block"></span>Entradas
-                                </span>
-                                <span class="flex items-center gap-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-sm bg-red-500 inline-block"></span>Saídas
-                                </span>
-                            </div>
-                        </div>
-                        <div class="h-[180px] border border-dashed border-slate-300 flex items-center justify-center text-slate-400 rounded-lg bg-slate-50">
-                            [Gráfico de Linhas]
-                        </div>
+                   <div class="bg-white p-6 rounded-2xl shadow-sm">
+                       <h3 class="text-md font-bold mb-4">Fluxo de Caixa (Receitas vs Despesas)</h3>
+                        <canvas id="graficoFluxoCaixa" width="400" height="200"></canvas>
                     </div>
                     
                     <!-- Painel de Resumo -->
@@ -253,5 +242,40 @@
 <a th:href="@{/movimentacoes}" class="...">
     <i class='bx bx-plus-medical text-lg'></i> Movimentações
 </a>
-</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    async function carregarGrafico() {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const empresaId = urlParams.get('empresaId') || '1';
+
+            const res = await fetch(`/contabilidade/api/dashboard-dados?empresaId=${empresaId}`);
+            const dados = await res.json();
+
+            const ctx = document.getElementById('graficoFluxoCaixa').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Receitas', 'Despesas'],
+                    datasets: [{
+                        label: 'Valores em R$',
+                        data: [dados.totalReceitas, dados.totalDespesas], 
+                        backgroundColor: ['#0aa958', '#dc3545'], 
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            }); // Fecha o new Chart
+        } catch (error) {
+            console.error("Erro ao carregar o gráfico:", error);
+        } // Fecha o catch
+    } // Fecha a função carregarGrafico
+
+    document.addEventListener("DOMContentLoaded", carregarGrafico);
+</script> </body>
 </html>

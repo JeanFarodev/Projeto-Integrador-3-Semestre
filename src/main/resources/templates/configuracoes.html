@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Configurações - Sistema de Gestão</title>
+    <title>Configurações - LOGOS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,13 +18,18 @@
     <div class="flex flex-1 overflow-hidden">
         <aside class="w-[260px] bg-white flex flex-col justify-between border-r border-slate-200 shrink-0">
             <nav class="p-4 mt-2">
-                <ul class="flex flex-col gap-1">
-                    <li><a th:href="@{/dashboard}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm"><i class='bx bxs-right-arrow-circle text-lg'></i> Dashboard</a></li>
-                    <li><a th:href="@{/movimentacoes}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm"><i class='bx bx-plus-medical text-lg'></i> Movimentações</a></li>
-                    <li><a th:href="@{/fechamento}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm"><i class='bx bx-briefcase text-lg'></i> Fechamento</a></li>
-                    <li><a th:href="@{/relatorios}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm"><i class='bx bx-envelope text-lg'></i> Relatórios</a></li>
-                    <li><a th:href="@{/produtos}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm"><i class='bx bxs-user-detail text-lg'></i> Produtos</a></li>
-                    <li><a th:href="@{/configuracoes}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-semibold text-sm shadow-sm"><i class='bx bx-cog text-lg'></i> Configurações</a></li>
+               <ul class="flex flex-col gap-1">
+                    <li><a th:href="@{/contabilidade/dashboard(empresaId=1)}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors"><i class='bx bxs-right-arrow-circle text-lg'></i> Dashboard</a></li>
+                    
+                    <li><a th:href="@{/contabilidade/lista}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors"><i class='bx bx-plus-medical text-lg'></i> Movimentações</a></li>
+                    
+                    <li><a th:href="@{/contabilidade/saldo}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors"><i class='bx bx-briefcase text-lg'></i> Fechamento</a></li>
+                    
+                    <li><a th:href="@{/contabilidade/pdf(empresaId=1)}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors"><i class='bx bx-envelope text-lg'></i> Relatórios</a></li>
+                    
+                    <li><a th:href="@{/produtos}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-semibold text-sm shadow-sm transition-colors"><i class='bx bxs-user-detail text-lg'></i> Produtos</a></li>
+                    
+                    <li><a th:href="@{/configuracoes}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors"><i class='bx bx-cog text-lg'></i> Configurações</a></li>
                 </ul>
             </nav>
         </aside>
