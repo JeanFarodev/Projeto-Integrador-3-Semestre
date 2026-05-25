@@ -8,34 +8,26 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        primary: '#1c3e86', 
-                        accent: '#2f65f6', 
-                        success: '#0aa958', 
-                        danger: '#df2727', 
-                        background: '#f4f6fa' 
-                    }
-                }
-            }
-        }
+        tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{primary:'#1c3e86',accent:'#2f65f6',success:'#0aa958',danger:'#df2727',background:'#f4f6fa'}}}}
     </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .nav-item { @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors; }
+            .nav-active { @apply flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-semibold text-sm shadow-sm transition-colors; }
+            .th-cell { @apply text-slate-500 font-semibold py-4 px-6 text-sm; }
+            .td-cell { @apply py-4 px-6 text-sm; }
+            .filter-input { @apply px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:border-accent; }
+            .page-btn { @apply px-3 py-1 border border-slate-200 rounded hover:bg-slate-50 transition; }
+        }
+    </style>
 </head>
 <body class="flex flex-col h-screen bg-background text-slate-800 font-sans overflow-hidden">
 
     <header class="bg-primary text-white py-4 px-6 flex justify-between items-center shrink-0">
-        <div class="flex items-center gap-3 text-lg font-semibold">
-            <i class='bx bx-laptop text-2xl'></i>
-            <span>Sistema de Gestão de Caixa</span>
-        </div>
+        <div class="flex items-center gap-3 text-lg font-semibold"><i class='bx bx-laptop text-2xl'></i><span>Sistema de Gestão de Caixa</span></div>
         <div class="flex items-center gap-5 text-xl">
             <i class='bx bxs-bell cursor-pointer hover:text-slate-300 transition'></i>
-            <div class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full cursor-pointer hover:bg-white/30 transition">
-                <i class='bx bxs-user-circle'></i>
-            </div>
+            <div class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full cursor-pointer hover:bg-white/30 transition"><i class='bx bxs-user-circle'></i></div>
         </div>
     </header>
 
@@ -44,21 +36,9 @@
         <aside class="w-[260px] bg-white flex flex-col justify-between border-r border-slate-200 shrink-0">
             <nav class="p-4 mt-2">
                 <ul class="flex flex-col gap-1">
-                    <li>
-                        <a th:href="@{/dashboard}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors">
-                            <i class='bx bxs-right-arrow-circle text-lg'></i> Dashboard
-                        </a>
-                    </li>
-                    <li>
-                        <a th:href="@{/movimentacoes}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-semibold text-sm shadow-sm transition-colors">
-                            <i class='bx bx-plus-medical text-lg'></i> Movimentações
-                        </a>
-                    </li>
-                    <li>
-                        <a th:href="@{/fechamento}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors">
-                            <i class='bx bx-briefcase text-lg'></i> Fechamento de Caixa
-                        </a>
-                    </li>
+                    <li><a th:href="@{/dashboard}" class="nav-item"><i class='bx bxs-right-arrow-circle text-lg'></i> Dashboard</a></li>
+                    <li><a th:href="@{/movimentacoes}" class="nav-active"><i class='bx bx-plus-medical text-lg'></i> Movimentações</a></li>
+                    <li><a th:href="@{/fechamento}" class="nav-item"><i class='bx bx-briefcase text-lg'></i> Fechamento de Caixa</a></li>
                 </ul>
             </nav>
             
@@ -83,14 +63,14 @@
             <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-100 flex flex-wrap gap-4 items-center">
                 <div class="flex-1 min-w-[200px] relative">
                     <i class='bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg'></i>
-                    <input type="text" placeholder="Buscar por descrição..." class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                    <input type="text" placeholder="Buscar por descrição..." class="w-full pl-10 filter-input">
                 </div>
-                <select class="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:border-accent bg-white">
+                <select class="filter-input bg-white">
                     <option value="">Todos os Tipos</option>
                     <option value="entrada">Apenas Entradas</option>
                     <option value="saida">Apenas Saídas</option>
                 </select>
-                <input type="date" class="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:border-accent">
+                <input type="date" class="filter-input">
                 <button class="bg-slate-100 text-slate-700 px-5 py-2 rounded-lg font-semibold text-sm hover:bg-slate-200 transition">Filtrar</button>
             </div>
 
@@ -99,28 +79,22 @@
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead class="bg-slate-50 sticky top-0">
                             <tr class="border-b border-slate-200">
-                                <th class="text-slate-500 font-semibold py-4 px-6 text-sm">Data/Hora</th>
-                                <th class="text-slate-500 font-semibold py-4 px-6 text-sm">Tipo</th>
-                                <th class="text-slate-500 font-semibold py-4 px-6 text-sm">Descrição</th>
-                                <th class="text-slate-500 font-semibold py-4 px-6 text-sm">Usuário</th>
-                                <th class="text-slate-500 font-semibold py-4 px-6 text-sm text-right">Valor</th>
+                                <th class="th-cell">Data/Hora</th>
+                                <th class="th-cell">Tipo</th>
+                                <th class="th-cell">Descrição</th>
+                                <th class="th-cell">Usuário</th>
+                                <th class="th-cell text-right">Valor</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="mov : ${listaMovimentacoes}" class="border-b border-slate-100 hover:bg-slate-50 transition">
-                                <td class="py-4 px-6 text-slate-600 text-sm" th:text="${mov.data}">21/10/2021 14:30</td>
-                                <td class="py-4 px-6">
-                                    <span class="px-3 py-1 rounded-md text-xs font-semibold text-white" 
-                                          th:classappend="${mov.valor >= 0 ? 'bg-success' : 'bg-danger'}" 
-                                          th:text="${mov.tipo}">Entrada</span>
+                                <td class="td-cell text-slate-600" th:text="${mov.data}">21/10/2021 14:30</td>
+                                <td class="td-cell">
+                                    <span class="px-3 py-1 rounded-md text-xs font-semibold text-white" th:classappend="${mov.valor >= 0 ? 'bg-success' : 'bg-danger'}" th:text="${mov.tipo}">Entrada</span>
                                 </td>
-                                <td class="py-4 px-6 text-slate-800 font-medium text-sm" th:text="${mov.descricao}">Venda de Produto</td>
-                                <td class="py-4 px-6 text-slate-600 text-sm" th:text="${mov.usuario}">Ana Silva</td>
-                                <td class="py-4 px-6 font-semibold text-sm text-right" 
-                                    th:classappend="${mov.valor >= 0 ? 'text-success' : 'text-danger'}" 
-                                    th:text="${(mov.valor >= 0 ? '+ R$ ' : '- R$ ') + #numbers.formatDecimal(#numbers.abs(mov.valor), 1, 'POINT', 2, 'COMMA')}">
-                                    + R$ 450,00
-                                </td>
+                                <td class="td-cell text-slate-800 font-medium" th:text="${mov.descricao}">Venda de Produto</td>
+                                <td class="td-cell text-slate-600" th:text="${mov.usuario}">Ana Silva</td>
+                                <td class="td-cell font-semibold text-right" th:classappend="${mov.valor >= 0 ? 'text-success' : 'text-danger'}" th:text="${(mov.valor >= 0 ? '+ R$ ' : '- R$ ') + #numbers.formatDecimal(#numbers.abs(mov.valor), 1, 'POINT', 2, 'COMMA')}">+ R$ 450,00</td>
                             </tr>
                         </tbody>
                     </table>
@@ -129,22 +103,15 @@
                 <div class="p-4 border-t border-slate-100 flex justify-between items-center text-sm text-slate-500 bg-white">
                     <span>Mostrando 1 até 10 de 50 registros</span>
                     <div class="flex gap-1">
-                        <button class="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50 transition">Anterior</button>
+                        <button class="page-btn">Anterior</button>
                         <button class="px-3 py-1 bg-accent text-white rounded font-medium shadow-sm">1</button>
-                        <button class="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50 transition">2</button>
-                        <button class="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50 transition">Próxima</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">Próxima</button>
                     </div>
                 </div>
             </div>
 
         </main>
     </div>
-    <a th:href="@{/dashboard}" class="...">
-    <i class='bx bxs-right-arrow-circle text-lg'></i> Dashboard
-</a>
-
-<a th:href="@{/movimentacoes}" class="...">
-    <i class='bx bx-plus-medical text-lg'></i> Movimentações
-</a>
 </body>
 </html>
