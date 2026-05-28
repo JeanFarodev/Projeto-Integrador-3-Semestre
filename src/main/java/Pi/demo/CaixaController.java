@@ -18,7 +18,7 @@ public class CaixaController {
 }
 
     // 1. ROTA DO DASHBOARD (Para onde o botão de login te manda)
-    @GetMapping("/dashboard")
+    @GetMapping("/caixa/dashboard")
     public String abrirDashboard(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
         model.addAttribute("saldoAtual", 5320.00);
@@ -36,7 +36,7 @@ public class CaixaController {
     }
 
     // 2. ROTA DE MOVIMENTAÇÕES
-    @GetMapping("/movimentacoes")
+    @GetMapping("/caixa/movimentacoes")
     public String abrirMovimentacoes(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
 
@@ -50,7 +50,7 @@ public class CaixaController {
     }
 
     // 3. ROTA DE FECHAMENTO DE CAIXA
-    @GetMapping("/fechamento")
+    @GetMapping("/caixa/fechamento")
     public String abrirFechamento(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
 
@@ -70,7 +70,7 @@ public class CaixaController {
     }
 
     // 4. ROTA DE RELATÓRIOS
-    @GetMapping("/relatorios")
+    @GetMapping("/caixa/relatorios")
     public String abrirRelatorios(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
         
@@ -85,7 +85,7 @@ public class CaixaController {
     }
 
     // 5. ROTA DE PRODUTOS
-    @GetMapping("/produtos")
+    @GetMapping("/caixa/produtos")
     public String abrirProdutos(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
         
@@ -100,7 +100,7 @@ public class CaixaController {
     }
 
     // 6. ROTA DE CONFIGURAÇÕES
-    @GetMapping("/configuracoes")
+    @GetMapping("/caixa/configuracoes")
     public String abrirConfiguracoes(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
         return "configuracoes";

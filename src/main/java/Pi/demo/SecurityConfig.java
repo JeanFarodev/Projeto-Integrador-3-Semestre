@@ -10,34 +10,38 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Define o padrão de criptografia
+        return new BCryptPasswordEncoder();
     }
 
-    // Forma moderna de exportar o AuthenticationManager no Spring Boot 3
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Desabilita para facilitar testes REST
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/h2-console/**").permitAll() // Permite acesso ao banco
-                .anyRequest().authenticated() // Exige login para tudo
+                .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                .anyRequest().authenticated()
             )
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-            .httpBasic(withDefaults()); // Habilita o login básico para o arquivo .http
-        
+            .formLogin(form -> form
+                .loginPage("/login")                                              // sua página de login
+                .defaultSuccessUrl("/contabilidade/dashboard?empresaId=1", true) // redireciona após login
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutSuccessUrl("/login")
+                .permitAll()
+            );
+
         return http.build();
     }
 }

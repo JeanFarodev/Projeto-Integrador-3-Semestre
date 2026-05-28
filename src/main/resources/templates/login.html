@@ -13,9 +13,9 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: '#1c3e86', 
-                        accent: '#2f65f6', 
-                        background: '#f4f6fa' 
+                        primary: '#1c3e86',
+                        accent: '#2f65f6',
+                        background: '#f4f6fa'
                     }
                 }
             }
@@ -25,7 +25,7 @@
 <body class="flex items-center justify-center h-screen bg-background font-sans">
 
     <div class="bg-white p-10 rounded-2xl shadow-md w-full max-w-md border border-slate-100 mx-4">
-        
+
         <div class="flex flex-col items-center justify-center mb-8 text-primary">
             <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                 <i class='bx bx-laptop text-4xl'></i>
@@ -34,13 +34,16 @@
             <p class="text-slate-500 text-sm mt-1">Insira suas credenciais para continuar</p>
         </div>
 
-        <form th:action="@{/dashboard}" method="get" class="flex flex-col gap-5">
-            
+        <form th:action="@{/contabilidade/
+dashboard}" method="get" class="flex flex-col gap-5">
+
+            <input type="hidden" name="empresaId" value="1">
+
             <div>
                 <label for="usuario" class="block text-sm font-semibold text-slate-600 mb-1.5">Usuário ou E-mail</label>
                 <div class="relative">
                     <i class='bx bx-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl'></i>
-                    <input type="text" id="usuario" name="usuario" required placeholder="ex: ana.silva" 
+                    <input type="text" id="usuario" name="usuario" required placeholder="ex: ana.silva"
                            class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all">
                 </div>
             </div>
@@ -52,7 +55,7 @@
                 </div>
                 <div class="relative">
                     <i class='bx bx-lock-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl'></i>
-                    <input type="password" id="senha" name="senha" required placeholder="••••••••" 
+                    <input type="password" id="senha" name="senha" required placeholder="••••••••"
                            class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all">
                 </div>
             </div>

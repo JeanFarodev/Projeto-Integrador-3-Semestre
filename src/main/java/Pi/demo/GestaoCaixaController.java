@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,43 +30,51 @@ public class GestaoCaixaController {
     // =========================================================================
     // DASHBOARD (você pode já ter outro HTML; aqui só faço exemplo mínimo)
     // =========================================================================
-   @GetMapping("/gestao-caixa/dashboard")
-    public String dashboard(@RequestParam(defaultValue = "1") Long empresaId, Model model) {
+   @GetMapping("/contabilidade/dashboard")
+public String dashboard(@RequestParam(defaultValue = "1") Long empresaId, Model model) {
 
-        Optional<Empresa> empOpt = empresaRepository.findById(empresaId);
-        if (empOpt.isEmpty()) {
-            // se não tem empresa, pode redirecionar ou criar uma default
-            return "redirect:/movimentacoes"; 
-        }
-        Empresa empresa = empOpt.get();
+    Optional<Empresa> empOpt = empresaRepository.findById(empresaId);
+    if (empOpt.isEmpty()) return "redirect:/";
+    Empresa empresa = empOpt.get();
 
-        List<Lancamento> lancamentos = lancamentoRepository.findByEmpresaId(empresaId);
+    List<Lancamento> lancamentos = lancamentoRepository.findByEmpresaId(empresaId);
 
-        BigDecimal receitas = lancamentos.stream()
-                .filter(l -> l.getCategoria() != null &&
-                             "RECEITA".equalsIgnoreCase(l.getCategoria().getTipo()))
-                .map(Lancamento::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal receitas = lancamentos.stream()
+            .filter(l -> l.getCategoria() != null &&
+                         "RECEITA".equalsIgnoreCase(l.getCategoria().getTipo()))
+            .map(Lancamento::getValor)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal despesas = lancamentos.stream()
-                .filter(l -> l.getCategoria() != null &&
-                             "DESPESA".equalsIgnoreCase(l.getCategoria().getTipo()))
-                .map(Lancamento::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal despesas = lancamentos.stream()
+            .filter(l -> l.getCategoria() != null &&
+                         "DESPESA".equalsIgnoreCase(l.getCategoria().getTipo()))
+            .map(Lancamento::getValor)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal saldo = receitas.subtract(despesas);
+    BigDecimal saldo   = receitas.subtract(despesas);
+    BigDecimal imposto = receitas.multiply(new BigDecimal("0.06"));
 
-        model.addAttribute("empresaId", empresaId);
-        model.addAttribute("nomeEmpresa", empresa.getNome());
-        model.addAttribute("receitas", receitas);
-        model.addAttribute("despesas", despesas);
-        model.addAttribute("saldo", saldo);
+    String saude;
+    if (saldo.compareTo(BigDecimal.ZERO) > 0)      saude = "Positiva — receitas superam as despesas.";
+    else if (saldo.compareTo(BigDecimal.ZERO) == 0) saude = "Neutra — entradas igualam as saídas.";
+    else                                             saude = "Negativa — despesas superam as receitas.";
 
-        // se seu dashboard.html espera mais atributos, adicione aqui
+    String regime = receitas.compareTo(new BigDecimal("360000")) <= 0
+            ? "Simples Nacional" : "Lucro Presumido";
 
-        return "dashboard"; // precisa existir dashboard.html em templates
-    }
+    // Nomes exatos que o dashboard.html usa no th:text
+    model.addAttribute("empresaId",        empresaId);
+    model.addAttribute("nomeEmpresa",      empresa.getNome());
+    model.addAttribute("receitas",         receitas);
+    model.addAttribute("despesas",         despesas);
+    model.addAttribute("saldo",            saldo);
+    model.addAttribute("imposto",          imposto);
+    model.addAttribute("saude",            saude);
+    model.addAttribute("sugestaoRegime",   regime);
+    model.addAttribute("listaLancamentos", lancamentos);
 
+    return "contabilidade/dashboard"; // HTML em templates/contabilidade/dashboard.html
+}
     // =========================================================================
     // MOVIMENTAÇÕES  -> movimentacoes.html
     // =========================================================================
