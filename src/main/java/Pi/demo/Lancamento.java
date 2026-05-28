@@ -2,7 +2,6 @@ package Pi.demo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
