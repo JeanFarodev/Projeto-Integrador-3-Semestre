@@ -24,10 +24,41 @@
 <body class="flex flex-col h-screen bg-background text-slate-800 font-sans overflow-hidden">
 
     <header class="bg-primary text-white py-4 px-6 flex justify-between items-center shrink-0">
-        <div class="flex items-center gap-3 text-lg font-semibold"><i class='bx bx-laptop text-2xl'></i><span>Sistema de Gestão de Caixa</span></div>
-        <div class="flex items-center gap-5 text-xl">
+        <div class="flex items-center gap-3 text-lg font-semibold">
+            <i class='bx bx-laptop text-2xl'></i><span>Sistema de Gestão de Caixa</span>
+        </div>
+        
+        <div class="flex items-center gap-5 text-xl relative">
             <i class='bx bxs-bell cursor-pointer hover:text-slate-300 transition'></i>
-            <div class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full cursor-pointer hover:bg-white/30 transition"><i class='bx bxs-user-circle'></i></div>
+            
+            <div class="relative flex items-center">
+                <div onclick="togglePerfil(event)" id="btnPerfil" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full cursor-pointer hover:bg-white/30 transition text-2xl">
+                    <i class='bx bxs-user-circle'></i>
+                </div>
+
+                <div id="dropdownPerfil" class="hidden absolute right-0 top-full mt-3 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden transform origin-top-right transition-all text-left">
+                    <div class="p-5 border-b border-slate-100 bg-white flex items-center gap-4">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Foto do Usuário" class="w-12 h-12 rounded-full object-cover border border-slate-100 shadow-sm">
+                        <div class="flex flex-col">
+                            <span class="text-base font-bold text-slate-800" th:text="${usuario.nome}">Ana Silva</span>
+                            <span class="text-sm text-slate-400 font-medium">ana.silva@sistema.com.br</span>
+                        </div>
+                    </div>
+                    <div class="p-3 space-y-1">
+                        <a th:href="@{/perfil}" class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 font-medium rounded-xl transition text-sm">
+                            <i class='bx bx-user text-xl text-slate-500'></i> Meu Perfil
+                        </a>
+                        <a th:href="@{/configuracoes}" class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 font-medium rounded-xl transition text-sm">
+                            <i class='bx bx-cog text-xl text-slate-500'></i> Configurações
+                        </a>
+                    </div>
+                    <div class="p-3 border-t border-slate-100">
+                        <a th:href="@{/logout}" class="flex items-center gap-3 px-4 py-3 text-danger hover:bg-red-50 rounded-xl transition font-semibold text-sm">
+                            <i class='bx bx-log-out text-xl'></i> Sair do Sistema
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -152,24 +183,40 @@
             </form>
         </div>
     </div>
+
     <script>
+        // --- CONTROLE DA TELA DE PERFIL (DROPDOWN) ---
+        function togglePerfil(event) {
+            event.stopPropagation(); // Evita que feche logo após abrir
+            const dropdown = document.getElementById('dropdownPerfil');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // --- CONTROLE DO MODAL NOVA MOVIMENTAÇÃO ---
         const btnNovaMov = document.getElementById('btnNovaMov');
         const modalNovaMov = document.getElementById('modalNovaMov');
         const btnFecharModal = document.getElementById('btnFecharModal');
         const btnCancelarModal = document.getElementById('btnCancelarModal');
 
-        // Função para mostrar/esconder o modal
         function toggleModal() {
             modalNovaMov.classList.toggle('hidden');
         }
 
-        // Adiciona os eventos de clique nos botões
         btnNovaMov.addEventListener('click', toggleModal);
         btnFecharModal.addEventListener('click', toggleModal);
         btnCancelarModal.addEventListener('click', toggleModal);
 
-        // Fecha o modal se o usuário clicar fora da caixa branca
-        modalNovaMov.addEventListener('click', function(event) {
+        // --- EVENTO GLOBAL DE CLIQUE (FECHAR ELEMENTOS AO CLICAR FORA) ---
+        window.addEventListener('click', function(event) {
+            // Fechar Dropdown do Perfil
+            const btnPerfil = document.getElementById('btnPerfil');
+            const dropdownPerfil = document.getElementById('dropdownPerfil');
+            
+            if (btnPerfil && dropdownPerfil && !btnPerfil.contains(event.target) && !dropdownPerfil.contains(event.target)) {
+                dropdownPerfil.classList.add('hidden');
+            }
+
+            // Fechar Modal ao clicar no backdrop escuro de fora
             if (event.target === modalNovaMov) {
                 toggleModal();
             }
