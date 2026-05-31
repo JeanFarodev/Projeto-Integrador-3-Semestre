@@ -30,4 +30,9 @@ public class LogAtividade {
     public String getAcao() { return acao; }
     public String getDetalhes() { return detalhes; }
     public LocalDateTime getDataHora() { return dataHora; }
+
+    public void setId(Long id)             { this.id = id; }
+    public void setAcao(String acao)       { this.acao = acao; }
+    public void setDetalhes(String det)    { this.detalhes = det; }
+    public void setDataHora(LocalDateTime d) { this.dataHora = d; }
 }

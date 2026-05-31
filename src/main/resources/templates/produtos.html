@@ -10,7 +10,7 @@
         tailwind.config = { theme: { extend: { colors: { primary: '#1c3e86', accent: '#2f65f6', success: '#0aa958', background: '#f4f6fa' } } } }
     </script>
 </head>
-<body class="flex flex-col h-screen bg-background text-slate-800 font-sans overflow-hidden">
+<body class="flex flex-col h-screen bg-background text-slate-800 font-sans overflow-hidden relative">
     <header class="bg-primary text-white py-4 px-6 flex justify-between items-center shrink-0">
         <div class="flex items-center gap-3 text-lg font-semibold"><i class='bx bx-laptop text-2xl'></i><span>Sistema de Gestão</span></div>
     </header>
@@ -29,10 +29,10 @@
             </nav>
         </aside>
 
-        <main class="flex-1 p-8 overflow-y-auto flex flex-col gap-6">
+        <main class="flex-1 p-8 overflow-y-auto flex flex-col gap-6 relative">
             <div class="flex justify-between items-center">
                 <h2 class="text-2xl font-bold text-slate-800">Catálogo de Produtos</h2>
-                <button class="bg-success text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:bg-green-600 transition flex items-center gap-2">
+                <button onclick="abrirModal()" class="bg-success text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:bg-green-600 transition flex items-center gap-2">
                     <i class='bx bx-plus'></i> Novo Produto
                 </button>
             </div>
@@ -47,9 +47,16 @@
                             <th class="py-4 px-6 text-sm font-semibold text-slate-500 text-right">Preço</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr th:each="prod : ${listaProdutos}" class="border-b border-slate-100">
-                            <td class="py-4 px-6 text-slate-800 font-medium text-sm" th:text="${prod.nome}">Nome do Produto</td>
+                    <tbody id="tabelaProdutos">
+                        <tr th:each="prod : ${listaProdutos}" class="border-b border-slate-100 hover:bg-slate-50 transition">
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-slate-800 font-medium text-sm" th:text="${prod.nome}">Nome do Produto</span>
+                                    <button onclick="removerProduto(this)" class="text-slate-400 hover:text-red-500 transition-colors" title="Excluir Produto">
+                                        <i class='bx bx-trash text-lg'></i>
+                                    </button>
+                                </div>
+                            </td>
                             <td class="py-4 px-6 text-slate-500 text-sm" th:text="${prod.categoria}">Categoria</td>
                             <td class="py-4 px-6 text-center font-semibold text-sm" th:text="${prod.estoque}">10</td>
                             <td class="py-4 px-6 text-right font-semibold text-slate-800 text-sm" th:text="'R$ ' + ${#numbers.formatDecimal(prod.preco, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
@@ -59,5 +66,124 @@
             </div>
         </main>
     </div>
+
+    <div id="modalNovoProduto" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden transform transition-all">
+            
+            <div class="flex justify-between items-center p-6 border-b border-slate-100 bg-slate-50">
+                <h3 class="text-xl font-bold text-slate-800">Adicionar Novo Produto</h3>
+                <button onclick="fecharModal()" class="text-slate-400 hover:text-red-500 transition text-2xl" title="Fechar">
+                    <i class='bx bx-x'></i>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <form id="formProduto" th:action="@{/produtos/salvar}" method="POST" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-semibold text-slate-600">Nome do Produto</label>
+                            <input type="text" id="inputNome" name="nome" required placeholder="Ex: Teclado Mecânico" 
+                                   class="px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition">
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-semibold text-slate-600">Categoria</label>
+                            <select id="inputCategoria" name="categoria" class="px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition bg-white">
+                                <option value="Periféricos">Periféricos</option>
+                                <option value="Hardware">Hardware</option>
+                                <option value="Acessórios">Acessórios</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-semibold text-slate-600">Estoque Inicial</label>
+                            <input type="number" id="inputEstoque" name="estoque" required placeholder="0" min="0"
+                                   class="px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition">
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-semibold text-slate-600">Preço de Venda (R$)</label>
+                            <input type="number" id="inputPreco" name="preco" step="0.01" required placeholder="0.00" min="0"
+                                   class="px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition">
+                        </div>
+
+                    </div>
+
+                    <div class="pt-6 mt-2 flex justify-end gap-3 border-t border-slate-100">
+                        <button type="button" onclick="fecharModal()" class="px-5 py-2.5 rounded-lg font-semibold text-sm text-slate-600 hover:bg-slate-100 transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="bg-success text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:bg-green-600 transition flex items-center gap-2">
+                            <i class='bx bx-save'></i> Salvar Produto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('modalNovoProduto');
+        const formProduto = document.getElementById('formProduto');
+        const tabelaProdutos = document.getElementById('tabelaProdutos');
+
+        function abrirModal() {
+            modal.classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            modal.classList.add('hidden');
+            formProduto.reset(); 
+        }
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                fecharModal();
+            }
+        });
+
+        // Função para remover a linha da tabela quando clica na lixeira
+        function removerProduto(botaoClicado) {
+            // Busca a tag <tr> (linha) mais próxima do botão clicado e remove ela da tela
+            const linha = botaoClicado.closest('tr');
+            if (linha) {
+                linha.remove();
+            }
+        }
+
+        // Script para adicionar o produto visualmente
+        formProduto.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const nome = document.getElementById('inputNome').value;
+            const categoria = document.getElementById('inputCategoria').value;
+            const estoque = document.getElementById('inputEstoque').value;
+            const preco = parseFloat(document.getElementById('inputPreco').value);
+
+            const precoFormatado = preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            const novaLinha = document.createElement('tr');
+            novaLinha.className = 'border-b border-slate-100 hover:bg-slate-50 transition';
+
+            // Incluído o botão de excluir junto ao nome na nova linha
+            novaLinha.innerHTML = `
+                <td class="py-4 px-6">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-800 font-medium text-sm">${nome}</span>
+                        <button onclick="removerProduto(this)" class="text-slate-400 hover:text-red-500 transition-colors" title="Excluir Produto">
+                            <i class='bx bx-trash text-lg'></i>
+                        </button>
+                    </div>
+                </td>
+                <td class="py-4 px-6 text-slate-500 text-sm">${categoria}</td>
+                <td class="py-4 px-6 text-center font-semibold text-sm">${estoque}</td>
+                <td class="py-4 px-6 text-right font-semibold text-slate-800 text-sm">${precoFormatado}</td>
+            `;
+
+            tabelaProdutos.appendChild(novaLinha);
+            fecharModal();
+        });
+    </script>
 </body>
 </html>

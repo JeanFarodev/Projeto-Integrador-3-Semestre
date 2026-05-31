@@ -4,7 +4,7 @@ public enum TipoPessoa {
     PF("Pessoa Física"),
     PJ("Pessoa Jurídica");
 
-    private String descricao;
+   private final String descricao;
 
     TipoPessoa(String descricao) {
         this.descricao = descricao;

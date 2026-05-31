@@ -16,7 +16,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(); // ✅ essencial
     }
 
     @Bean
@@ -33,8 +33,9 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login")                                              // sua página de login
-                .defaultSuccessUrl("/contabilidade/dashboard?empresaId=1", true) // redireciona após login
+                .loginPage("/login")
+                .loginProcessingUrl("/login-spring") // ✅ evita conflito com seu POST /login
+                .defaultSuccessUrl("/caixa/dashboard", true)
                 .permitAll()
             )
             .logout(logout -> logout

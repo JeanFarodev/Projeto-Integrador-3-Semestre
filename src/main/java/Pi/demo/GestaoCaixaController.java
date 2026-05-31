@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -75,8 +73,7 @@ public String dashboard(@RequestParam(defaultValue = "1") Long empresaId, Model 
 
     return "contabilidade/dashboard"; // HTML em templates/contabilidade/dashboard.html
 }
-    // =========================================================================
-    // MOVIMENTAÇÕES  -> movimentacoes.html
+
     // =========================================================================
     @GetMapping("/movimentacoes")
     public String listarMovimentacoes(@RequestParam(defaultValue = "1") Long empresaId,
@@ -223,17 +220,20 @@ public String dashboard(@RequestParam(defaultValue = "1") Long empresaId, Model 
     private List<MovimentacaoTelaDTO> mapearMovimentacoesParaTela(List<Lancamento> lancamentos) {
         List<MovimentacaoTelaDTO> lista = new ArrayList<>();
         for (Lancamento l : lancamentos) {
-            MovimentacaoTelaDTO dto = new MovimentacaoTelaDTO();
-            dto.setData(l.getData() != null ? l.getData().atStartOfDay() : null); // Converte LocalDate para LocalDateTime
-            dto.setDescricao(l.getDescricao());
-            dto.setValor(l.getValor());
-            dto.setUsuario("Ana Silva");               // mock, depois vem de usuário logado
-
+            String tipo;
             if (l.getValor().compareTo(BigDecimal.ZERO) >= 0) {
-                dto.setTipo("ENTRADA");
+                tipo = "ENTRADA";
             } else {
-                dto.setTipo("SAIDA");
+                tipo = "SAIDA";
             }
+
+            MovimentacaoTelaDTO dto = new MovimentacaoTelaDTO(
+                l.getData() != null ? l.getData().atStartOfDay() : null,
+                tipo,
+                l.getDescricao(),
+                "Ana Silva", // mock, depois vem de usuário logado
+                l.getValor()
+            );
             lista.add(dto);
         }
         return lista;

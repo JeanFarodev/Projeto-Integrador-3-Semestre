@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Gestão</title>
+    
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,16 +15,16 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: '#1c3e86', 
-                        accent: '#2f65f6', 
-                        background: '#f4f6fa' 
+                        primary: '#1c3e86',
+                        accent: '#2f65f6',
+                        background: '#f4f6fa'
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="flex items-center justify-center h-screen bg-background font-sans">
+<body class="flex items-center justify-center min-h-screen bg-background font-sans">
 
     <div class="bg-white p-10 rounded-2xl shadow-md w-full max-w-md border border-slate-100 mx-4">
         
@@ -40,7 +42,7 @@
                 <label for="usuario" class="block text-sm font-semibold text-slate-600 mb-1.5">Usuário ou E-mail</label>
                 <div class="relative">
                     <i class='bx bx-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl'></i>
-                    <input type="text" id="usuario" name="usuario" required placeholder="ex: ana.silva" 
+                    <input type="text" id="usuario" name="usuario" required placeholder="ex: ana.silva"
                            class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all">
                 </div>
             </div>
@@ -52,7 +54,7 @@
                 </div>
                 <div class="relative">
                     <i class='bx bx-lock-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl'></i>
-                    <input type="password" id="senha" name="senha" required placeholder="••••••••" 
+                    <input type="password" id="senha" name="senha" required placeholder="••••••••"
                            class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all">
                 </div>
             </div>
@@ -62,38 +64,60 @@
                 <label for="lembrar" class="text-sm text-slate-600 cursor-pointer">Lembrar minhas credenciais</label>
             </div>
 
-            <button type="submit" class="mt-2 w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-blue-900 transition-colors shadow-sm flex justify-center items-center gap-2">
+            <!-- Mensagem de erro -->
+            <div id="mensagemErro" class="hidden bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl text-center">
+                Usuário ou senha incorretos.
+            </div>
+
+            <button type="submit" id="btnEntrar" class="mt-2 w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-blue-900 transition-colors shadow-sm flex justify-center items-center gap-2">
                 Continuar <i class='bx bx-right-arrow-alt text-2xl'></i>
             </button>
 
         </form>
-
     </div>
 
     <script>
-        // Captura o formulário e os inputs
         const form = document.getElementById('formLogin');
         const inputUsuario = document.getElementById('usuario');
         const inputSenha = document.getElementById('senha');
+        const mensagemErro = document.getElementById('mensagemErro');
+        const btnEntrar = document.getElementById('btnEntrar');
 
-        // Adiciona a ação quando o usuário tenta enviar o formulário
         form.addEventListener('submit', function(event) {
-            // Impede que a página recarregue
-            event.preventDefault(); 
+            event.preventDefault();
 
-            const usuarioDigitado = inputUsuario.value;
-            const senhaDigitada = inputSenha.value;
+            // Feedback visual no botão
+            btnEntrar.disabled = true;
+            btnEntrar.innerHTML = `<i class='bx bx-loader-alt bx-spin text-2xl'></i> Verificando...`;
+            mensagemErro.classList.add('hidden');
 
-            // Validação local de exemplo
-            if (usuarioDigitado === "admin" && senhaDigitada === "12345") {
-                alert("Acesso liberado! Redirecionando...");
-                
-                // Redireciona para o arquivo do dashboard. 
-                // Certifique-se de que o arquivo "dashboard.html" exista na mesma pasta.
-                window.location.href = "dashboard.html"; 
-            } else {
-                alert("Usuário ou Senha incorretos. Tente: admin / 12345");
-            }
+            fetch('/login', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+        
+    },
+    body: JSON.stringify({
+        usuario: inputUsuario.value,
+        senha: inputSenha.value
+    })
+})
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/dashboard';
+                } else {
+                    // ✅ Mostra mensagem de erro no HTML ao invés de alert()
+                    mensagemErro.classList.remove('hidden');
+                    btnEntrar.disabled = false;
+                    btnEntrar.innerHTML = `Continuar <i class='bx bx-right-arrow-alt text-2xl'></i>`;
+                }
+            })
+            .catch(() => {
+                mensagemErro.textContent = 'Erro ao conectar com o servidor.';
+                mensagemErro.classList.remove('hidden');
+                btnEntrar.disabled = false;
+                btnEntrar.innerHTML = `Continuar <i class='bx bx-right-arrow-alt text-2xl'></i>`;
+            });
         });
     </script>
 

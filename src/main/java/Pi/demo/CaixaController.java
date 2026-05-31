@@ -1,23 +1,52 @@
-package Pi.demo; // MANTENHA A SUA PRIMEIRA LINHA AQUI (pode ser diferente desta)
+package Pi.demo;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class CaixaController {
 
-    // 0. ROTA DE LOGIN (É a primeira tela a carregar no localhost:8080)
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping({"/", "/login"})
     public String abrirLogin() {
-    return "login"; // Precisa ser exatamente assim
-}
+        return "login";
+    }
 
-    // 1. ROTA DO DASHBOARD (Para onde o botão de login te manda)
+    @PostMapping("/login")
+    @ResponseBody
+    public ResponseEntity<String> processarLogin(@RequestBody LoginRequest body) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(body.getUsuario());
+
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            if (passwordEncoder.matches(body.getSenha(), usuario.getSenha())) {
+                return ResponseEntity.ok("sucesso");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("credenciais inválidas");
+    }
+
+    // ✅ Corrigido: nome diferente + redirect para /caixa/dashboard
+    @GetMapping("/dashboard")
+    public String redirecionarDashboard() {
+        return "redirect:/caixa/dashboard";
+    }
+
     @GetMapping("/caixa/dashboard")
     public String abrirDashboard(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
@@ -32,10 +61,9 @@ public class CaixaController {
         model.addAttribute("movimentacoes", movimentacoesResumo);
         model.addAttribute("alertaCedulas", true);
 
-        return "dashboard"; 
+        return "dashboard";
     }
 
-    // 2. ROTA DE MOVIMENTAÇÕES
     @GetMapping("/caixa/movimentacoes")
     public String abrirMovimentacoes(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
@@ -46,18 +74,16 @@ public class CaixaController {
         );
         model.addAttribute("listaMovimentacoes", listaCompleta);
 
-        return "movimentacoes"; 
+        return "movimentacoes";
     }
 
-    // 3. ROTA DE FECHAMENTO DE CAIXA
     @GetMapping("/caixa/fechamento")
     public String abrirFechamento(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
-
         model.addAttribute("dinheiroGaveta", 2150.00);
         model.addAttribute("totalCartoes", 1500.00);
         model.addAttribute("totalPix", 720.00);
-        model.addAttribute("totalTurno", 4370.00); 
+        model.addAttribute("totalTurno", 4370.00);
 
         List<Map<String, Object>> historico = Arrays.asList(
             Map.of("data", "21/10/2021 18:30", "operador", "Ana Silva", "valorSistema", 5200.00, "valorDeclarado", 5200.00, "diferenca", 0.00),
@@ -66,40 +92,37 @@ public class CaixaController {
         );
         model.addAttribute("historicoFechamentos", historico);
 
-        return "fechamento"; 
+        return "fechamento";
     }
 
-    // 4. ROTA DE RELATÓRIOS
     @GetMapping("/caixa/relatorios")
     public String abrirRelatorios(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
-        
+
         List<Map<String, String>> relatorios = Arrays.asList(
             Map.of("titulo", "Fechamentos do Mês", "descricao", "Resumo de todos os fechamentos de caixa dos últimos 30 dias."),
             Map.of("titulo", "Fluxo de Caixa", "descricao", "Relatório detalhado de entradas e saídas."),
             Map.of("titulo", "Produtos Mais Vendidos", "descricao", "Ranking de produtos com maior saída no período.")
         );
         model.addAttribute("listaRelatorios", relatorios);
-        
+
         return "relatorios";
     }
 
-    // 5. ROTA DE PRODUTOS
     @GetMapping("/caixa/produtos")
     public String abrirProdutos(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));
-        
+
         List<Map<String, Object>> produtos = Arrays.asList(
             Map.of("nome", "Caderno Universitário", "categoria", "Papelaria", "estoque", 45, "preco", 22.90),
             Map.of("nome", "Caneta Esferográfica Azul", "categoria", "Papelaria", "estoque", 120, "preco", 2.50),
             Map.of("nome", "Mochila Escolar", "categoria", "Acessórios", "estoque", 15, "preco", 89.90)
         );
         model.addAttribute("listaProdutos", produtos);
-        
+
         return "produtos";
     }
 
-    // 6. ROTA DE CONFIGURAÇÕES
     @GetMapping("/caixa/configuracoes")
     public String abrirConfiguracoes(Model model) {
         model.addAttribute("usuario", Map.of("nome", "Ana Silva", "cargo", "Gerente"));

@@ -12,7 +12,10 @@ public class LancamentoService {
 
     // REGRA 1: Ao salvar, garantimos que o lançamento pertence à empresa do usuário
     public Lancamento salvar(Lancamento lancamento, Empresa empresaLogada) {
-        lancamento.setEmpresa(empresaLogada); 
+        if (lancamento == null) {
+            throw new IllegalArgumentException("Lançamento não pode ser nulo.");
+        }
+        lancamento.setEmpresa(empresaLogada);
         return lancamentoRepository.save(lancamento);
     }
 
