@@ -57,80 +57,97 @@ public class CaixaController {
         }
     }
 
-   @GetMapping({"/", "/login"})
+    @GetMapping({"/", "/login"})
     public String abrirLogin() {
         return "login";
     }
     
-    @GetMapping("/dashboard")
-    public String mostrarDashboard() {
-        // Retorna o nome exato do arquivo HTML ("dashboard.html") que está na raiz de templates
-        return "dashboard"; 
-    }
-   
-    @GetMapping("/caixa/dashboard")
+    // 🟢 UNIFICADO: Removeu o método duplicado menor que causava tela vazia
+    @GetMapping({"/dashboard", "/caixa/dashboard"})
     public String abrirDashboard(Model model) {
-        List<Empresa> empresas = empresaRepository.findAll();
+        List<Empresa> empresas = new ArrayList<>();
+        try {
+            empresas = empresaRepository.findAll();
+        } catch (Exception e) {
+            System.out.println("Aviso: Tabela empresa não encontrada ou vazia.");
+        }
+        
         Empresa empresaAtual = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : null;
-        
         String nomeEmpresaReal = (empresaAtual != null && empresaAtual.getNome() != null) ? empresaAtual.getNome() : "Lumina Café & Co.";
-        Long idEmpresaReal = (empresaAtual != null) ? empresaAtual.getId() : 1L;
         
-        // 🟢 BLINDAGEM: Garante que o regime nunca seja nulo
+        // Se houver empresa, usa o ID dela; caso contrário, usa null para evitar buscar id falso
+        Long idEmpresaReal = (empresaAtual != null) ? empresaAtual.getId() : null;
+        
         RegimeTributario regime = (empresaAtual != null && empresaAtual.getRegimeTributario() != null) 
                 ? empresaAtual.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
 
-        List<Lancamento> todosLancamentos = lancamentoRepository.findAll();
+        List<Lancamento> todosLancamentos = new ArrayList<>();
+        try {
+            todosLancamentos = lancamentoRepository.findAll();
+        } catch (Exception e) {
+            System.out.println("Aviso: Tabela lancamento vazia ou não encontrada.");
+        }
 
-        BigDecimal totalReceitas = todosLancamentos.stream()
-                .map(Lancamento::getValor)
-                .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalReceitas = BigDecimal.ZERO;
+        BigDecimal totalDespesas = BigDecimal.ZERO;
+        BigDecimal totalDono = BigDecimal.ZERO;
 
-        BigDecimal totalDespesas = todosLancamentos.stream()
-                .map(Lancamento::getValor)
-                .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
-                .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+        if (todosLancamentos != null && !todosLancamentos.isEmpty()) {
+            totalReceitas = todosLancamentos.stream()
+                    .map(Lancamento::getValor)
+                    .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            totalDespesas = todosLancamentos.stream()
+                    .map(Lancamento::getValor)
+                    .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+
+            totalDono = todosLancamentos.stream()
+                    .filter(l -> l.getValor() != null && l.getCategoria() != null && l.getCategoria().getNome() != null)
+                    .filter(l -> {
+                        String nomeCat = l.getCategoria().getNome().toUpperCase();
+                        return nomeCat.contains("SÓCIO") || nomeCat.contains("DONO") || 
+                               nomeCat.contains("RETIRADA") || nomeCat.contains("LABORE");
+                    })
+                    .map(Lancamento::getValor)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+        }
 
         BigDecimal saldoAtual = totalReceitas.subtract(totalDespesas);
-        
         BigDecimal impostoEstimado = calcularImposto(totalReceitas, totalDespesas, regime);
-
-        BigDecimal totalDono = todosLancamentos.stream()
-                .filter(l -> l.getValor() != null && l.getCategoria() != null && l.getCategoria().getNome() != null)
-                .filter(l -> {
-                    String nomeCat = l.getCategoria().getNome().toUpperCase();
-                    return nomeCat.contains("SÓCIO") || nomeCat.contains("DONO") || 
-                           nomeCat.contains("RETIRADA") || nomeCat.contains("LABORE");
-                })
-                .map(Lancamento::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
 
         BigDecimal percentualDono = BigDecimal.ZERO;
         if (totalReceitas.compareTo(BigDecimal.ZERO) > 0) {
             percentualDono = totalDono.multiply(new BigDecimal("100"))
                     .divide(totalReceitas, 2, java.math.RoundingMode.HALF_UP);
         }
-
         if (percentualDono.compareTo(new BigDecimal("100")) > 0) {
             percentualDono = new BigDecimal("100");
         }
 
-        List<Lancamento> ultimosLancamentos = lancamentoRepository.findTop5ByEmpresaIdOrderByDataDesc(idEmpresaReal);
+        // Busca os últimos lançamentos de forma segura
+        List<Lancamento> ultimosLancamentos = new ArrayList<>();
+        if (idEmpresaReal != null) {
+            try {
+                ultimosLancamentos = lancamentoRepository.findTop5ByEmpresaIdOrderByDataDesc(idEmpresaReal);
+            } catch (Exception e) {
+                System.out.println("Erro ao buscar top 5 lançamentos: " + e.getMessage());
+            }
+        }
 
         model.addAttribute("nomeEmpresa", nomeEmpresaReal); 
         model.addAttribute("totalReceitas", totalReceitas);
         model.addAttribute("totalDespesas", totalDespesas);
         model.addAttribute("saldoAtual", saldoAtual);
         model.addAttribute("impostoEstimado", impostoEstimado);
-        model.addAttribute("movimentacoes", ultimosLancamentos);
+        model.addAttribute("movimentacoes", ultimosLancamentos != null ? ultimosLancamentos : new ArrayList<>());
         model.addAttribute("totalDono", totalDono);
         model.addAttribute("percentualDono", percentualDono);
 
-        // 🟢 CORRIGIDO AQUI: Retorna direto o arquivo da raiz de templates
         return "dashboard"; 
     }
-
+    
     @GetMapping("/caixa/novo")
     public String exibirFormularioNovoLancamento(Model model) {
         List<Empresa> empresas = empresaRepository.findAll();
