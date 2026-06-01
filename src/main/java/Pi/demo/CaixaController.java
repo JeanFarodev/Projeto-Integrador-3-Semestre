@@ -198,7 +198,7 @@ public class CaixaController {
         model.addAttribute("nomeEmpresa", nomeEmpresaReal);
         model.addAttribute("listaCategorias", categoriasValidas);
         
-         return "redirect:/caixa/dashboard"; 
+         return "redirect:/caixa/categorias"; 
     }
 
     @PostMapping("/caixa/categorias/salvar")
