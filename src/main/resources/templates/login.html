@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema de Gestão</title>
+    <title>Login - LOGOS</title>
     
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,6 +25,9 @@
 </head>
 <body class="flex items-center justify-center min-h-screen bg-background font-sans">
 
+    <input type="hidden" id="csrfToken" th:value="${_csrf.token}" />
+    <input type="hidden" id="csrfHeader" th:value="${_csrf.headerName}" />
+
     <div class="bg-white p-10 rounded-2xl shadow-md w-full max-w-md border border-slate-100 mx-4">
         
         <div class="flex flex-col items-center justify-center mb-8 text-primary">
@@ -42,8 +44,8 @@
                 <label for="usuario" class="block text-sm font-semibold text-slate-600 mb-1.5">Usuário ou E-mail</label>
                 <div class="relative">
                     <i class='bx bx-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl'></i>
-                    <input type="text" id="usuario" name="usuario" required placeholder="ex: ana.silva"
-                           class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all">
+                    <input type="text" id="usuario" name="username" required placeholder="ex: ana.silva"
+                           class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all bg-white">
                 </div>
             </div>
 
@@ -54,8 +56,8 @@
                 </div>
                 <div class="relative">
                     <i class='bx bx-lock-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl'></i>
-                    <input type="password" id="senha" name="senha" required placeholder="••••••••"
-                           class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all">
+                    <input type="password" id="senha" name="password" required placeholder="••••••••"
+                           class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all bg-white">
                 </div>
             </div>
 
@@ -64,12 +66,11 @@
                 <label for="lembrar" class="text-sm text-slate-600 cursor-pointer">Lembrar minhas credenciais</label>
             </div>
 
-            <!-- Mensagem de erro -->
-            <div id="mensagemErro" class="hidden bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl text-center">
+            <div id="mensagemErro" class="hidden bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl text-center font-medium">
                 Usuário ou senha incorretos.
             </div>
 
-            <button type="submit" id="btnEntrar" class="mt-2 w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-blue-900 transition-colors shadow-sm flex justify-center items-center gap-2">
+            <button type="submit" id="btnEntrar" class="mt-2 w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-blue-900 transition-colors shadow-sm flex justify-center items-center gap-2 cursor-pointer">
                 Continuar <i class='bx bx-right-arrow-alt text-2xl'></i>
             </button>
 
@@ -82,53 +83,59 @@
     const inputSenha = document.getElementById('senha');
     const mensagemErro = document.getElementById('mensagemErro');
     const btnEntrar = document.getElementById('btnEntrar');
+    
+    // Captura as chaves do token de segurança CSRF geradas dinamicamente pelo Thymeleaf
+    const csrfToken = document.getElementById('csrfToken').value;
+    const csrfHeader = document.getElementById('csrfHeader').value;
 
     form.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        // Trava o botão para evitar cliques duplos
+        // Bloqueia cliques contínuos durante o processamento da requisição
         btnEntrar.disabled = true;
         btnEntrar.innerHTML = `<i class='bx bx-loader-alt bx-spin text-2xl'></i> Verificando...`;
         mensagemErro.classList.add('hidden');
 
         const dadosFormulario = new URLSearchParams();
-        dadosFormulario.append('usuario', inputUsuario.value);
-        dadosFormulario.append('senha', inputSenha.value);
+        // 🟢 ATUALIZADO: Passa as chaves exatas de mapeamento do AuthenticationProvider
+        dadosFormulario.append('username', inputUsuario.value);
+        dadosFormulario.append('password', inputSenha.value);
 
-        console.log('Enviando dados para o Spring...');
+        console.log('Enviando dados estruturados para o Spring Security...');
 
-        fetch('/login-spring', {
+        // O endpoint padrão de captura do Spring Security costuma ser '/login' processado via POST
+        fetch('/login', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                [csrfHeader]: csrfToken // 🟢 INJEÇÃO CRÍTICA: Envia o token CSRF no header para evitar erro 403 Forbidden
             },
             body: dadosFormulario
         })
         .then(response => {
-            console.log('Resposta recebida do servidor. Status:', response.status);
-            console.log('Redirecionado pelo servidor?', response.redirected);
+            console.log('Resposta recebida. Status:', response.status);
 
-            // Cenário 1: Se o Spring Security autenticou e mandou redirecionar
+            // Se o Spring Security autenticou com sucesso, ele faz o redirecionamento automático
             if (response.redirected) {
-                console.log('Redirecionando para:', response.url);
+                console.log('Redirecionando usuário autenticado para:', response.url);
                 window.location.href = response.url;
                 return;
             }
 
-            // Cenário 2: Se a resposta foi OK (Status 200), força a ida para o Dashboard
+            // Se retornar status OK ou cair no sucesso da rota padrão, direciona pro Dashboard unificado
             if (response.ok) {
                 window.location.href = '/caixa/dashboard';
                 return;
             }
 
-            // Cenário 3: Se caiu em erro (401 Não Autorizado, 403, etc)
-            throw new Error('Falha na autenticação. Status: ' + response.status);
+            // Se o status for 401 (Unauthorized), significa credenciais inválidas
+            throw new Error('Falha na autenticação do sistema. Status: ' + response.status);
         })
         .catch(error => {
-            console.error('Erro capturado no fluxo de login:', error);
+            console.error('Erro interceptado no fluxo de autenticação:', error);
             
-            // DESTRAVA O BOTÃO SE DER ERRO
-            mensagemErro.textContent = 'Usuário ou senha incorretos ou erro de conexão.';
+            // Destrava os botões e injeta o alerta
+            mensagemErro.textContent = 'Usuário ou senha incorretos.';
             mensagemErro.classList.remove('hidden');
             btnEntrar.disabled = false;
             btnEntrar.innerHTML = `Continuar <i class='bx bx-right-arrow-alt text-2xl'></i>`;
@@ -136,6 +143,5 @@
     });
 </script>
 
-
 </body>
-</html>onst i
+</html>

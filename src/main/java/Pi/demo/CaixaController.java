@@ -1,7 +1,7 @@
 package Pi.demo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +30,7 @@ public class CaixaController {
     private EmpresaRepository empresaRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
 
     // 🟢 AUXILIAR: MOTOR TRIBUTÁRIO DINÂMICO DO LOGOS
     private BigDecimal calcularImposto(BigDecimal receitas, BigDecimal despesas, RegimeTributario regime) {
@@ -57,24 +57,28 @@ public class CaixaController {
         }
     }
 
-    @GetMapping({"/", "/login"})
+   @GetMapping({"/", "/login"})
     public String abrirLogin() {
         return "login";
     }
     
     @GetMapping("/dashboard")
-    public String redirecionarDashboard() {
-        return "redirect:/caixa/dashboard";
+    public String mostrarDashboard() {
+        // Retorna o nome exato do arquivo HTML ("dashboard.html") que está na raiz de templates
+        return "dashboard"; 
     }
-
+   
     @GetMapping("/caixa/dashboard")
     public String abrirDashboard(Model model) {
         List<Empresa> empresas = empresaRepository.findAll();
         Empresa empresaAtual = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : null;
         
-        String nomeEmpresaReal = (empresaAtual != null) ? empresaAtual.getNome() : "Lumina Café & Co.";
+        String nomeEmpresaReal = (empresaAtual != null && empresaAtual.getNome() != null) ? empresaAtual.getNome() : "Lumina Café & Co.";
         Long idEmpresaReal = (empresaAtual != null) ? empresaAtual.getId() : 1L;
-        RegimeTributario regime = (empresaAtual != null) ? empresaAtual.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
+        
+        // 🟢 BLINDAGEM: Garante que o regime nunca seja nulo
+        RegimeTributario regime = (empresaAtual != null && empresaAtual.getRegimeTributario() != null) 
+                ? empresaAtual.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
 
         List<Lancamento> todosLancamentos = lancamentoRepository.findAll();
 
@@ -90,8 +94,27 @@ public class CaixaController {
 
         BigDecimal saldoAtual = totalReceitas.subtract(totalDespesas);
         
-        // 🟢 CÁLCULO DINÂMICO: Usa o motor tributário baseado no regime salvo no banco!
         BigDecimal impostoEstimado = calcularImposto(totalReceitas, totalDespesas, regime);
+
+        BigDecimal totalDono = todosLancamentos.stream()
+                .filter(l -> l.getValor() != null && l.getCategoria() != null && l.getCategoria().getNome() != null)
+                .filter(l -> {
+                    String nomeCat = l.getCategoria().getNome().toUpperCase();
+                    return nomeCat.contains("SÓCIO") || nomeCat.contains("DONO") || 
+                           nomeCat.contains("RETIRADA") || nomeCat.contains("LABORE");
+                })
+                .map(Lancamento::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+
+        BigDecimal percentualDono = BigDecimal.ZERO;
+        if (totalReceitas.compareTo(BigDecimal.ZERO) > 0) {
+            percentualDono = totalDono.multiply(new BigDecimal("100"))
+                    .divide(totalReceitas, 2, java.math.RoundingMode.HALF_UP);
+        }
+
+        if (percentualDono.compareTo(new BigDecimal("100")) > 0) {
+            percentualDono = new BigDecimal("100");
+        }
 
         List<Lancamento> ultimosLancamentos = lancamentoRepository.findTop5ByEmpresaIdOrderByDataDesc(idEmpresaReal);
 
@@ -101,8 +124,11 @@ public class CaixaController {
         model.addAttribute("saldoAtual", saldoAtual);
         model.addAttribute("impostoEstimado", impostoEstimado);
         model.addAttribute("movimentacoes", ultimosLancamentos);
+        model.addAttribute("totalDono", totalDono);
+        model.addAttribute("percentualDono", percentualDono);
 
-        return "dashboard";
+        // 🟢 CORRIGIDO AQUI: Retorna direto o arquivo da raiz de templates
+        return "dashboard"; 
     }
 
     @GetMapping("/caixa/novo")
@@ -197,83 +223,93 @@ public class CaixaController {
         return "redirect:/caixa/dashboard";
     }
 
+
     @GetMapping("/caixa/relatorios")
-    public String abrirRelatorios(Model model) {
-        List<Empresa> empresas = empresaRepository.findAll();
-        Empresa empresaAtual = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : null;
-        
-        String nomeEmpresaReal = (empresaAtual != null) ? empresaAtual.getNome() : "Lumina Café & Co.";
-        Long idEmpresaReal = (empresaAtual != null) ? empresaAtual.getId() : 1L;
-        RegimeTributario regime = (empresaAtual != null) ? empresaAtual.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
+public String abrirRelatorios(Model model) {
+    List<Empresa> empresas = empresaRepository.findAll();
+    Empresa empresaAtual = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : null;
+    
+    String nomeEmpresaReal = (empresaAtual != null && empresaAtual.getNome() != null) ? empresaAtual.getNome() : "Lumina Café & Co.";
+    Long idEmpresaReal = (empresaAtual != null) ? empresaAtual.getId() : 1L;
+    
+    // 🟢 BLINDAGEM: Garante que o regime nunca seja nulo
+    RegimeTributario regime = (empresaAtual != null && empresaAtual.getRegimeTributario() != null) 
+            ? empresaAtual.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
 
-        List<Lancamento> todosLancamentos = lancamentoRepository.findAll();
+    List<Lancamento> todosLancamentos = lancamentoRepository.findAll();
 
-        BigDecimal totalReceitas = todosLancamentos.stream()
-                .map(Lancamento::getValor)
-                .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal totalReceitas = todosLancamentos.stream()
+            .map(Lancamento::getValor)
+            .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalDespesas = todosLancamentos.stream()
-                .map(Lancamento::getValor)
-                .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
-                .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+    BigDecimal totalDespesas = todosLancamentos.stream()
+            .map(Lancamento::getValor)
+            .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
+            .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
 
-        BigDecimal saldoAtual = totalReceitas.subtract(totalDespesas);
-        
-        // 🟢 CÁLCULO DINÂMICO PARA OS RELATÓRIOS
-        BigDecimal impostoEstimado = calcularImposto(totalReceitas, totalDespesas, regime);
+    BigDecimal saldoAtual = totalReceitas.subtract(totalDespesas);
+    BigDecimal impostoEstimado = calcularImposto(totalReceitas, totalDespesas, regime);
 
-        List<Lancamento> ultimosLancamentos = lancamentoRepository.findTop5ByEmpresaIdOrderByDataDesc(idEmpresaReal);
+    List<Lancamento> ultimosLancamentos = lancamentoRepository.findTop5ByEmpresaIdOrderByDataDesc(idEmpresaReal);
 
-        model.addAttribute("nomeEmpresa", nomeEmpresaReal); 
-        model.addAttribute("totalReceitas", totalReceitas);
-        model.addAttribute("totalDespesas", totalDespesas);
-        model.addAttribute("saldoAtual", saldoAtual);
-        model.addAttribute("impostoEstimado", impostoEstimado);
-        model.addAttribute("movimentacoes", ultimosLancamentos);
-        model.addAttribute("regimeTributario", regime != null ? regime.name() : "SIMPLES_NACIONAL");
+    model.addAttribute("nomeEmpresa", nomeEmpresaReal); 
+    model.addAttribute("totalReceitas", totalReceitas);
+    model.addAttribute("totalDespesas", totalDespesas);
+    model.addAttribute("saldoAtual", saldoAtual);
+    model.addAttribute("impostoEstimado", impostoEstimado);
+    model.addAttribute("movimentacoes", ultimosLancamentos);
+    model.addAttribute("regimeTributario", regime != null ? regime.name() : "SIMPLES_NACIONAL"); // 🟢 Seguro contra NullPointer
 
-        List<Map<String, String>> relatorios = Arrays.asList(
-            Map.of("titulo", "Fechamentos do Mês", "descricao", "Resumo de todos os fechamentos de caixa dos últimos 30 dias."),
-            Map.of("titulo", "Fluxo de Caixa", "descricao", "Relatório detalhado de entradas e saídas."),
-            Map.of("titulo", "Produtos Mais Vendidos", "descricao", "Ranking de produtos com maior saída no período.")
-        );
-        model.addAttribute("listaRelatorios", relatorios);
+    List<Map<String, String>> relatorios = Arrays.asList(
+        Map.of("titulo", "Fechamentos do Mês", "descricao", "Resumo de todos os fechamentos de caixa dos últimos 30 dias."),
+        Map.of("titulo", "Fluxo de Caixa", "descricao", "Relatório detalhado de entradas e saídas."),
+        Map.of("titulo", "Produtos Mais Vendidos", "descricao", "Ranking de produtos com maior saída no período.")
+    );
+    model.addAttribute("listaRelatorios", relatorios);
 
-        return "relatorios";
-    }
+    return "relatorios";
+}
 
     @GetMapping("/caixa/tributacao")
-    public String abrirTributacao(Model model) {
-        List<Empresa> empresas = empresaRepository.findAll();
-        Empresa empresa = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : new Empresa();
-        RegimeTributario regime = (empresa != null) ? empresa.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
+public String abrirTributacao(Model model) {
+    List<Empresa> empresas = empresaRepository.findAll();
+    Empresa empresa = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : null;
+    
+    // 🟢 BLINDAGEM: Garante que o regime nunca seja nulo ao chamar o método do Enum
+    RegimeTributario regime = (empresa != null && empresa.getRegimeTributario() != null) 
+            ? empresa.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
 
-        List<Lancamento> todos = lancamentoRepository.findAll();
-        BigDecimal faturamentoMensal = todos.stream()
-                .map(Lancamento::getValor)
-                .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    List<Lancamento> todos = lancamentoRepository.findAll();
+    BigDecimal faturamentoMensal = todos.stream()
+            .map(Lancamento::getValor)
+            .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalDespesas = todos.stream()
-                .map(Lancamento::getValor)
-                .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
-                .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+    BigDecimal totalDespesas = todos.stream()
+            .map(Lancamento::getValor)
+            .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
+            .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
 
-        // 🟢 CÁLCULOS TRIBUTÁRIOS DINÂMICOS
-        BigDecimal impostoSimples = faturamentoMensal.multiply(new BigDecimal("0.06"));
-        BigDecimal impostoPresumido = faturamentoMensal.multiply(new BigDecimal("0.1333"));
-        BigDecimal impostoAtual = calcularImposto(faturamentoMensal, totalDespesas, regime);
+    BigDecimal impostoSimples = faturamentoMensal.multiply(new BigDecimal("0.06"));
+    BigDecimal impostoPresumido = faturamentoMensal.multiply(new BigDecimal("0.1333"));
+    BigDecimal impostoAtual = calcularImposto(faturamentoMensal, totalDespesas, regime);
 
-        BigDecimal saldoAtual = faturamentoMensal.subtract(totalDespesas);
+    BigDecimal saldoAtual = faturamentoMensal.subtract(totalDespesas);
 
-        model.addAttribute("nomeEmpresa", empresa.getNome() != null ? empresa.getNome() : "Lumina Café & Co.");
-        model.addAttribute("faturamento", faturamentoMensal);
-        model.addAttribute("regimeAtual", regime != null ? regime.getDescricao() : "Simples Nacional");
-        model.addAttribute("impostoSimples", impostoSimples);
-        model.addAttribute("impostoPresumido", impostoPresumido);
-        model.addAttribute("saldoPosImposto", saldoAtual.subtract(impostoAtual));
+    model.addAttribute("nomeEmpresa", (empresa != null && empresa.getNome() != null) ? empresa.getNome() : "Lumina Café & Co.");
+    model.addAttribute("faturamento", faturamentoMensal);
+    model.addAttribute("regimeAtual", regime != null ? regime.name() : "Simples Nacional"); // 🟢 Seguro contra NullPointer
+    model.addAttribute("impostoSimples", impostoSimples);
+    model.addAttribute("impostoPresumido", impostoPresumido);
+    model.addAttribute("saldoPosImposto", saldoAtual.subtract(impostoAtual));
 
-        return "tributacao";
-    }
+    return "tributacao";
+}
+
+
+
+
+
+
 }
