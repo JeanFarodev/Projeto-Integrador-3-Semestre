@@ -3,201 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatórios - Sistema de Gestão</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+    <title>Relatórios - FINANÇAS PI</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: { extend: { colors: { primary: '#1a2d62', accent: '#2b5aee', success: '#0aa958', danger: '#df2727', background: '#f4f6fa' } } }
-        }
-    </script>
-    <style type="text/tailwindcss">
-        @layer components {
-            .icon-action { @apply cursor-pointer hover:text-slate-300 transition text-white; }
-        }
-    </style>
 </head>
-<body class="flex flex-col h-screen bg-background text-slate-800 font-sans overflow-hidden">
+<body class="bg-slate-50 text-slate-800 font-sans">
 
-    <header class="bg-primary text-white py-3 px-6 flex justify-between items-center shrink-0 shadow-md z-10">
-        <div class="flex items-center gap-3 text-lg font-semibold tracking-wide">
-            <i class='bx bx-desktop text-2xl'></i>
-            <span>Sistema de Gestão de Caixa</span>
-        </div>
-        
-        <div class="flex items-center gap-5 text-xl">
-            <div class="relative mt-1">
-                <i class='bx bxs-bell icon-action'></i>
-                <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-primary"></span>
-            </div>
-            
-            <div class="relative flex items-center">
-                <div class="w-9 h-9 flex items-center justify-center bg-slate-300 rounded-full cursor-pointer overflow-hidden border-2 border-transparent hover:border-white transition"
-                     onclick="toggleMenuUsuario()" title="Menu do usuário">
-                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Foto" class="w-full h-full object-cover">
+    <div class="flex h-screen">
+        <aside class="w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0">
+            <div>
+                <div class="mb-8">
+                    <h1 class="text-xl font-bold tracking-wider text-blue-400">LOGOS</h1>
+                    <p class="text-xs text-slate-400" th:text="${nomeEmpresa}">Nome da Empresa</p>
                 </div>
-                
-                <div id="menuUsuario" class="hidden absolute right-0 top-full mt-3 w-72 bg-white rounded-xl shadow-lg border border-slate-100 z-50 overflow-hidden transform origin-top-right transition-all text-left">
-                    <div class="p-5 border-b border-slate-100 bg-white flex items-center gap-4">
-                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Foto do Usuário" class="w-12 h-12 rounded-full object-cover border border-slate-100 shadow-sm">
-                        <div class="flex flex-col">
-                            <span class="text-base font-bold text-slate-800">Ana Silva</span>
-                            <span class="text-sm text-slate-500 font-medium">ana.silva@sistema.com.br</span>
-                        </div>
-                    </div>
-                    <div class="p-2 space-y-1">
-                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 font-medium rounded-lg transition text-sm">
-                            <i class='bx bx-user text-lg text-slate-400'></i> Meu Perfil
-                        </a>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 font-medium rounded-lg transition text-sm">
-                            <i class='bx bx-cog text-lg text-slate-400'></i> Configurações
-                        </a>
-                    </div>
-                    <div class="p-2 border-t border-slate-100">
-                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[#d93025] hover:bg-red-50 rounded-lg transition font-medium text-sm">
-                            <i class='bx bx-log-out text-lg'></i> Sair do Sistema
-                        </a>
+                <nav class="space-y-2">
+    <a th:href="@{/caixa/dashboard}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
+        <span>📊</span> <span>Dashboard</span>
+    </a>
+    <a th:href="@{/caixa/tributacao}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
+        <span>⚖️</span> <span>Inteligência Fiscal</span>
+    </a>
+    <a th:href="@{/caixa/categorias}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
+        <span>🏷️</span> <span>Categorias</span>
+    </a>
+    <a th:href="@{/caixa/relatorios}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-medium">
+        <span>📋</span> <span>Relatórios</span>
+    </a>
+    <a th:href="@{/caixa/configuracoes}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
+        <span>⚙️</span> <span>Configurações</span>
+    </a>
+</nav>
+            </div>
+            <div class="pt-4 border-t border-slate-800">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-bold text-sm text-white">VG</div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">Vinicius Gama</p>
+                        <a href="/logout" class="text-xs text-red-400 hover:underline">Sair do sistema</a>
                     </div>
                 </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="flex flex-1 overflow-hidden">
-        
-        <aside class="w-[260px] bg-white flex flex-col justify-between border-r border-slate-200 shrink-0 z-0">
-            <nav class="p-4 mt-2 overflow-y-auto">
-                <ul class="flex flex-col gap-1">
-                    <li><a th:href="@{/dashboard}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors"><i class='bx bxs-right-arrow-circle text-lg'></i> Dashboard</a></li>
-                    <li><a th:href="@{/movimentacoes}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors"><i class='bx bx-plus-medical text-lg'></i> Movimentações</a></li>
-                    <li><a th:href="@{/fechamento}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors"><i class='bx bx-briefcase text-lg'></i> Fechamento de Caixa</a></li>
-                    <li><a th:href="@{/relatorios}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-semibold text-sm shadow-sm transition-colors"><i class='bx bx-envelope text-lg'></i> Relatórios</a></li>
-                    <li><a th:href="@{/produtos}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors"><i class='bx bxs-user-detail text-lg'></i> Produtos</a></li>
-                    <li><a th:href="@{/configuracoes}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 font-semibold text-sm transition-colors"><i class='bx bx-cog text-lg'></i> Configurações</a></li>
-                </ul>
-            </nav>
-            
-            <div class="p-4 flex items-center gap-3 bg-white border-t mt-auto">
-                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-8 h-8 rounded-full object-cover">
-                <span class="font-bold text-sm text-slate-700">Ana Silva</span>
             </div>
         </aside>
 
-        <main class="flex-1 p-8 overflow-y-auto flex flex-col gap-6 w-full">
-            <h2 class="text-3xl font-bold text-[#1a2b49]">Emissão de Relatórios</h2>
+        <main class="flex-1 p-8 overflow-y-auto flex flex-col gap-6">
+            <header>
+                <h2 class="text-2xl font-bold text-slate-900">Emissão de Relatórios Gerenciais</h2>
+                <p class="text-sm text-slate-500">Gere e exporte relatórios dinâmicos analíticos utilizando a base de dados em tempo real.</p>
+            </header>
             
-            <div class="bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] p-6 border border-slate-100">
-                <h3 class="text-xl font-bold text-[#1a2b49] mb-6">Relatórios Disponíveis</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                <h3 class="font-bold text-slate-900 text-lg mb-6">Painel de Exportação</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     
-                    <div th:each="relatorio : ${listaRelatorios}" class="border border-slate-200 p-5 rounded-xl hover:border-accent hover:shadow-md transition cursor-pointer flex flex-col justify-between h-36">
+                    <div class="border border-slate-200 p-5 rounded-xl hover:border-blue-500 hover:shadow-md transition bg-white flex flex-col justify-between h-44">
                         <div>
-                            <h4 class="font-bold text-[#1a2b49] text-base" th:text="${relatorio.titulo}">Título</h4>
-                            <p class="text-sm text-slate-500 mt-2 line-clamp-2" th:text="${relatorio.descricao}">Descrição</p>
+                            <h4 class="font-bold text-slate-900 text-base">Demonstração de Fluxo de Caixa</h4>
+                            <p class="text-sm text-slate-500 mt-2 line-clamp-2">Balanço geral consolidando receitas totais, despesas operacionais, saldo líquido e provisão de tributos (6%).</p>
                         </div>
-                        <div class="text-right mt-4">
-                            <button onclick="gerarPDF(this)" class="text-accent text-sm font-semibold hover:underline flex items-center justify-end gap-1 w-full">
-                                <i class='bx bxs-file-pdf'></i> Gerar PDF
+                        <div class="pt-4 border-t border-slate-100 flex justify-end">
+                            <button th:onclick="gerarPdfFluxo([[${nomeEmpresa}]], [[${totalReceitas}]], [[${totalDespesas}]], [[${saldoAtual}]], [[${impostoEstimado}]])" 
+                                    class="text-blue-600 text-sm font-semibold hover:text-blue-800 flex items-center gap-1.5 cursor-pointer transition">
+                                📄 <span>Exportar DFC</span>
                             </button>
                         </div>
                     </div>
-                    
+
+                    <div class="border border-slate-200 p-5 rounded-xl hover:border-blue-500 hover:shadow-md transition bg-white flex flex-col justify-between h-44">
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-base">Extrato Analítico de Lançamentos</h4>
+                            <p class="text-sm text-slate-500 mt-2 line-clamp-2">Auditoria detalhada contendo o histórico das últimas movimentações processadas no sistema.</p>
+                        </div>
+                        <div class="pt-4 border-t border-slate-100 flex justify-end">
+                            <button id="btnExtrato" class="text-blue-600 text-sm font-semibold hover:text-blue-800 flex items-center gap-1.5 cursor-pointer transition">
+                                📄 <span>Exportar Extrato</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 p-5 rounded-xl hover:border-blue-500 hover:shadow-md transition bg-white flex flex-col justify-between h-44">
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-base">Diagnóstico de Saúde Fiscal</h4>
+                            <p class="text-sm text-slate-500 mt-2 line-clamp-2">Análise inteligente baseada no regime tributário e margem de lucro operacional.</p>
+                        </div>
+                        <div class="pt-4 border-t border-slate-100 flex justify-end">
+                            <button th:onclick="gerarDiagnosticoSaude([[${nomeEmpresa}]], [[${totalReceitas}]], [[${totalDespesas}]], [[${saldoAtual}]], [[${regimeTributario}]])" 
+                                    class="text-blue-600 text-sm font-semibold hover:text-blue-800 flex items-center gap-1.5 cursor-pointer transition">
+                                📄 <span>Gerar Diagnóstico</span>
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </main>
     </div>
 
-    <script>
-        function toggleMenuUsuario() {
-            const menu = document.getElementById('menuUsuario');
-            menu.classList.toggle('hidden');
-        }
-
-        document.addEventListener('click', function(e) {
-            const menu = document.getElementById('menuUsuario');
-            if (!e.target.closest('[onclick="toggleMenuUsuario()"]') && 
-                !e.target.closest('#menuUsuario')) {
-                menu.classList.add('hidden');
-            }
-        });
-
-        // =========================================================
-        // MOTOR DE ALTERAÇÃO E DOWNLOAD DE PDF (FRONT-END)
-        // =========================================================
-        function gerarPDF(botaoClicado) {
-            // Varre o DOM para buscar o contexto do card selecionado
-            const card = botaoClicado.closest('.border-slate-200');
-            const titulo = card.querySelector('h4').innerText;
-            const descricao = card.querySelector('p').innerText;
-
+    <script th:inline="javascript">
+        // 1. GERAR PDF DO FLUXO DE CAIXA CONSOLIDADO
+        function gerarPdfFluxo(empresa, receitas, despesas, saldo, imposto) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-
-            // Estilização do cabeçalho institucional do PDF
-            doc.setFontSize(22);
-            doc.setTextColor(26, 45, 98); // Cor correspondente ao #1a2d62 (primary)
-            doc.setFont("Helvetica", "bold");
-            doc.text("SISTEMA DE GESTÃO DE CAIXA", 20, 25);
-            
-            doc.setFontSize(10);
-            doc.setTextColor(100, 116, 139); // Slate-500
-            doc.setFont("Helvetica", "normal");
-            doc.text("Relatório Gerencial Corporativo", 20, 32);
-            
-            // Linha divisória estrutural
-            doc.setDrawColor(26, 45, 98);
-            doc.setLineWidth(0.5);
-            doc.line(20, 36, 190, 36);
-
-            // Subtítulo com o nome do relatório extraído do card
-            doc.setFontSize(14);
-            doc.setTextColor(43, 90, 238); // Cor correspondente ao #2b5aee (accent)
-            doc.setFont("Helvetica", "bold");
-            doc.text("Tipo de Relatório: " + titulo, 20, 48);
-
-            // Bloco conceitual fixo solicitado sobre Gestão de Caixa
-            doc.setFontSize(11);
-            doc.setTextColor(30, 41, 59); // Slate-800
-            doc.setFont("Helvetica", "bold");
-            doc.text("Diretriz Operacional (Gestão de Caixa):", 20, 60);
-
-            doc.setFont("Helvetica", "normal");
-            const textoGestaoCaixa = "A gestão de caixa constitui o pilar básico da saúde financeira da empresa. Consiste no controle minucioso e diário de todas as entradas e saídas de capital. Um monitoramento estruturado previne a escassez de capital de giro, garante o cumprimento pontual das obrigações com fornecedores e fornece uma base de dados sólida para mitigar riscos e guiar decisões estratégicas de investimento.";
-            const textoGestaoCaixaQuebrado = doc.splitTextToSize(textoGestaoCaixa, 170);
-            doc.text(textoGestaoCaixaQuebrado, 20, 66);
-
-            // Cálculo dinâmico de espaçamento para evitar sobreposição de textos
-            let yPos = 66 + (textoGestaoCaixaQuebrado.length * 6) + 10;
-
-            // Segunda linha divisória interna
-            doc.setDrawColor(226, 232, 240); // Slate-200
-            doc.line(20, yPos, 190, yPos);
-            yPos += 10;
-
-            // Apresentação dos dados específicos obtidos pelo Thymeleaf
-            doc.setFont("Helvetica", "bold");
-            doc.text("Detalhamento do Escopo:", 20, yPos);
-            yPos += 6;
-
-            doc.setFont("Helvetica", "normal");
-            const descricaoQuebrada = doc.splitTextToSize(descricao, 170);
-            doc.text(descricaoQuebrada, 20, yPos);
-
-            // Rodapé com metadados temporais
-            doc.setFontSize(9);
-            doc.setTextColor(148, 163, 184); // Slate-400
             const dataAtual = new Date().toLocaleString('pt-BR');
-            doc.text("Documento emitido via terminal web em: " + dataAtual, 20, 280);
-            doc.text("Página 1 de 1", 170, 280);
 
-            // Tratamento de caracteres especiais para o nome do arquivo baixado
-            const nomeArquivo = "relatorio_" + titulo.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() + ".pdf";
-            doc.save(nomeArquivo);
+            // Cabeçalho Estrutural
+            doc.setFontSize(18); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "bold");
+            doc.text("LOGOS — RELATÓRIO GERENCIAL", 20, 25);
+            doc.setFontSize(11); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
+            doc.text("Demonstração de Fluxo de Caixa (Consolidado)", 20, 32);
+            doc.setDrawColor(15, 23, 42); doc.setLineWidth(0.5); doc.line(20, 36, 190, 36);
+
+            // Dados da Entidade
+            doc.setFontSize(12); doc.setTextColor(51, 65, 85); doc.setFont("Helvetica", "bold");
+            doc.text("Empresa Auditada: " + empresa, 20, 48);
+            doc.setFont("Helvetica", "normal");
+            doc.text("Período de Apuração: Competência Mensal Vigente", 20, 54);
+
+            // Quadro Indicador Financeiro
+            doc.setDrawColor(226, 232, 240); doc.setFillColor(248, 250, 252);
+            doc.rect(20, 64, 170, 65, "FD");
+
+            doc.setFont("Helvetica", "bold"); doc.setTextColor(30, 41, 59);
+            doc.text("INDICADORES FINANCEIROS", 25, 74);
+            doc.line(25, 77, 185, 77);
+
+            doc.setFont("Helvetica", "normal");
+            doc.text("(+) Receitas Operacionais Brutas:", 25, 87);
+            doc.text("R$ " + Number(receitas).toLocaleString('pt-BR', {minimumFractionDigits: 2}), 130, 87);
+
+            doc.text("(-) Despesas / Custos de Operação:", 25, 95);
+            doc.text("R$ " + Number(despesas).toLocaleString('pt-BR', {minimumFractionDigits: 2}), 130, 95);
+
+            doc.text("(=) Provisão Simples Nacional (6%):", 25, 103);
+            doc.text("R$ " + Number(imposto).toLocaleString('pt-BR', {minimumFractionDigits: 2}), 130, 103);
+
+            doc.line(25, 109, 185, 109);
+            doc.setFont("Helvetica", "bold"); doc.setTextColor(37, 99, 235);
+            doc.text("(=) Saldo Líquido de Caixa Disponível:", 25, 119);
+            doc.text("R$ " + Number(saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2}), 130, 119);
+
+            // Assinatura e Notas
+            doc.setFontSize(10); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
+            doc.text("Parecer Técnico: Os dados acima refletem fielmente as transações armazenadas.", 20, 145);
+            doc.line(60, 185, 150, 185);
+            doc.text("Assinatura do Responsável pelo Caixa", 78, 190);
+
+            // Metadados Rodapé
+            doc.setFontSize(8); doc.text("Gerado em: " + dataAtual + " | Cód. Autenticador: PI-JPA-" + Math.floor(Math.random() * 10000), 20, 285);
+            doc.save("DFC_" + empresa.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() + ".pdf");
         }
+
+        // 2. CAPTURAR E GERAR PDF DO EXTRATO DE LANÇAMENTOS
+        /* Puxa a lista de movimentações real injetada pelo Spring Boot */
+        const movimentacoesReais = /*[[${movimentacoes}]]*/ [];
+        const empresaNome = /*[[${nomeEmpresa}]]*/ "";
+
+        document.getElementById("btnExtrato").addEventListener("click", function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const dataAtual = new Date().toLocaleString('pt-BR');
+
+            // Cabeçalho
+            doc.setFontSize(18); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "bold");
+            doc.text("LOGOS — EXTRATO DE CONTAS", 20, 25);
+            doc.setFontSize(11); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
+            doc.text("Histórico Analítico de Movimentações Recentes (" + empresaNome + ")", 20, 32);
+            doc.setDrawColor(15, 23, 42); doc.setLineWidth(0.5); doc.line(20, 36, 190, 36);
+
+            // Cabeçalho da Tabela Manual no PDF
+            let y = 50;
+            doc.setFontSize(10); doc.setFont("Helvetica", "bold"); doc.setTextColor(51, 65, 85);
+            doc.text("DATA", 20, y);
+            doc.text("DESCRIÇÃO DO LANÇAMENTO", 45, y);
+            doc.text("VALOR LIQUIDO", 155, y);
+            doc.line(20, y+3, 190, y+3);
+            y += 11;
+
+            doc.setFont("Helvetica", "normal"); doc.setTextColor(71, 85, 105);
+
+            if (!movimentacoesReais || movimentacoesReais.length === 0) {
+                doc.text("Nenhum lançamento contábil processado até o momento.", 20, y);
+            } else {
+                // Loop varrendo o JSON real trazido do PostgreSQL
+                movimentacoesReais.forEach((item) => {
+                    if (y > 260) { doc.addPage(); y = 30; } // Quebra de página automática se a tabela crescer
+
+                    // Formata Data
+                    const dataFormatada = item.data ? item.data.split("-").reverse().join("/") : "##/##/####";
+                    doc.text(dataFormatada, 20, y);
+                    
+                    // Formata Descrição
+                    doc.text(item.descricao, 45, y);
+                    
+                    // Formata Valor Monetário
+                    const v = Number(item.valor);
+                    if (v < 0) {
+                        doc.setTextColor(220, 38, 38); // Vermelho para despesa
+                    } else {
+                        doc.setTextColor(22, 163, 74); // Verde para receita
+                    }
+                    doc.text("R$ " + v.toLocaleString('pt-BR', {minimumFractionDigits: 2}), 155, y);
+                    
+                    doc.setTextColor(71, 85, 105); // Reseta a cor padrão para a próxima linha
+                    y += 8;
+                });
+            }
+
+            // Metadados Rodapé
+            doc.setFontSize(8); doc.setTextColor(148, 163, 184);
+            doc.text("Documento auditado e emitido de forma automatizada em: " + dataAtual, 20, 285);
+            doc.save("extrato_" + empresaNome.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() + ".pdf");
+        });
+
+        function gerarDiagnosticoSaude(empresa, receitas, despesas, saldo, regime) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const dataAtual = new Date().toLocaleString('pt-BR');
+
+    // Cabeçalho
+    doc.setFontSize(18); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "bold");
+    doc.text("SISTEMA LOGOS — AUDITORIA FISCAL", 20, 25);
+    doc.setFontSize(10); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
+    doc.text("Relatório de Diagnóstico de Saúde e Planejamento Tributário", 20, 32);
+    doc.setDrawColor(15, 23, 42); doc.setLineWidth(0.5); doc.line(20, 36, 190, 36);
+
+    // Identificação da Empresa
+    doc.setFontSize(11); doc.setTextColor(51, 65, 85); doc.setFont("Helvetica", "bold");
+    doc.text("Organização: " + empresa, 20, 46);
+    
+    // Converte a String do Enum para um formato legível na folha
+    let txtRegime = "Não Informado";
+    if (regime === "SIMPLES_NACIONAL") txtRegime = "Simples Nacional";
+    if (regime === "MEI") txtRegime = "Microempreendedor Individual (MEI)";
+    if (regime === "LUCRO_PRESUMIDO") txtRegime = "Lucro Presumido";
+    if (regime === "LUCRO_REAL") txtRegime = "Lucro Real";
+
+    doc.text("Regime Tributário Ativo: " + txtRegime, 20, 52);
+    doc.line(20, 56, 190, 56);
+
+    // LÓGICA DO PARECER FINANCEIRO
+    let statusSaude = "SAUDÁVEL";
+    let parecerTexto = "";
+    const margemLucro = receitas > 0 ? (saldo / receitas) * 100 : 0;
+
+    if (saldo < 0) {
+        statusSaude = "CRÍTICO (DÉFICIT OPERACIONAL)";
+        parecerTexto = "A empresa apresenta um saldo de caixa negativo no período analisado. Significa que os custos operacionais superaram a geração de receitas. Recomenda-se cortar gastos não essenciais e renegociar prazos de fornecedores antes de gerar as guias tributárias mensais.";
+    } else if (margemLucro < 15) {
+        statusSaude = "ATENÇÃO (MARGEM DE SEGURANÇA BAIXA)";
+        parecerTexto = "A operação encontra-se estável, porém a margem de lucro líquido está abaixo de 15%. Qualquer aumento imprevisto em custos fiscais comprometerá o capital de giro. Ação imediata: auditar despesas operacionais da aba de caixa.";
+    } else {
+        statusSaude = "EXCELENTE (SAÚDE FINANCEIRA COMPROVADA)";
+        parecerTexto = "A empresa demonstra ótima eficiência, com controle rígido sobre o fluxo de despesas. O caixa gerado suporta as obrigações do regime tributário atual e permite investimentos futuros.";
+    }
+
+    // Caixa de Destaque
+    doc.setFillColor(241, 245, 249); doc.rect(20, 63, 170, 14, "F");
+    doc.setFont("Helvetica", "bold"); doc.setTextColor(37, 99, 235);
+    doc.text("DIAGNÓSTICO DA OPERAÇÃO: " + statusSaude, 24, 72);
+
+    // Parecer Técnico
+    doc.setFontSize(11); doc.setTextColor(15, 23, 42); doc.text("Análise Crítica do Fluxo de Caixa:", 20, 90);
+    doc.setFont("Helvetica", "normal"); doc.setTextColor(51, 65, 85);
+    const parecerQuebrado = doc.splitTextToSize(parecerTexto, 170);
+    doc.text(parecerQuebrado, 20, 97);
+
+    // Planejamento Baseado no Enum Real do Supabase
+    let yPos = 97 + (parecerQuebrado.length * 6) + 12;
+    doc.setFont("Helvetica", "bold"); doc.setTextColor(15, 23, 42);
+    doc.text("Diretriz de Planejamento Tributário:", 20, yPos);
+    
+    yPos += 7;
+    doc.setFont("Helvetica", "normal"); doc.setTextColor(51, 65, 85);
+    
+    let recomendacaoFiscal = "Monitore as movimentações brutas de receitas para evitar desenquadramentos fiscais indesejados ao fim do ano letivo.";
+    
+    if (regime === "MEI") {
+        recomendacaoFiscal = "Atenção ao limite anual do MEI (R$ 81.000,00). Com base no seu faturamento atualizado, certifique-se de que a média mensal não ultrapasse R$ 6.750,00 para evitar a migração retroativa e obrigatória para o Simples Nacional.";
+    } else if (regime === "SIMPLES_NACIONAL") {
+        recomendacaoFiscal = "Sua alíquota base estimada está inserida na faixa inicial. Monitore a receita bruta acumulada dos últimos 12 meses. Caso ultrapasse o teto da primeira faixa, o sistema calculará o imposto com a alíquota progressiva efetiva.";
+    } else if (regime === "LUCRO_PRESUMIDO" || regime === "LUCRO_REAL") {
+        recomendacaoFiscal = "Regime de tributação geral corporativo. Recomenda-se realizar uma auditoria rigorosa de créditos tributários sobre insumos e despesas operacionais registradas no LOGOS para fins de abatimento de IRPJ e CSLL.";
+    }
+
+    const recQuebrada = doc.splitTextToSize(recomendacaoFiscal, 170);
+    doc.text(recQuebrada, 20, yPos);
+
+    // Rodapé
+    doc.setFontSize(8); doc.setTextColor(148, 163, 184);
+    doc.text("Documento de auditoria automatizado em: " + dataAtual, 20, 285);
+    doc.text("LOGOS Business Intelligence v1.0", 140, 285);
+
+    doc.save("Diagnostico_Saude_" + empresa.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() + ".pdf");
+}
     </script>
 </body>
 </html>

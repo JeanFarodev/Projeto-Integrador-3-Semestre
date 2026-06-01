@@ -77,49 +77,65 @@
     </div>
 
     <script>
-        const form = document.getElementById('formLogin');
-        const inputUsuario = document.getElementById('usuario');
-        const inputSenha = document.getElementById('senha');
-        const mensagemErro = document.getElementById('mensagemErro');
-        const btnEntrar = document.getElementById('btnEntrar');
+    const form = document.getElementById('formLogin');
+    const inputUsuario = document.getElementById('usuario');
+    const inputSenha = document.getElementById('senha');
+    const mensagemErro = document.getElementById('mensagemErro');
+    const btnEntrar = document.getElementById('btnEntrar');
 
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
 
-            // Feedback visual no botão
-            btnEntrar.disabled = true;
-            btnEntrar.innerHTML = `<i class='bx bx-loader-alt bx-spin text-2xl'></i> Verificando...`;
-            mensagemErro.classList.add('hidden');
+        // Trava o botão para evitar cliques duplos
+        btnEntrar.disabled = true;
+        btnEntrar.innerHTML = `<i class='bx bx-loader-alt bx-spin text-2xl'></i> Verificando...`;
+        mensagemErro.classList.add('hidden');
 
-            fetch('/login', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-        
-    },
-    body: JSON.stringify({
-        usuario: inputUsuario.value,
-        senha: inputSenha.value
-    })
-})
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = '/dashboard';
-                } else {
-                    // ✅ Mostra mensagem de erro no HTML ao invés de alert()
-                    mensagemErro.classList.remove('hidden');
-                    btnEntrar.disabled = false;
-                    btnEntrar.innerHTML = `Continuar <i class='bx bx-right-arrow-alt text-2xl'></i>`;
-                }
-            })
-            .catch(() => {
-                mensagemErro.textContent = 'Erro ao conectar com o servidor.';
-                mensagemErro.classList.remove('hidden');
-                btnEntrar.disabled = false;
-                btnEntrar.innerHTML = `Continuar <i class='bx bx-right-arrow-alt text-2xl'></i>`;
-            });
+        const dadosFormulario = new URLSearchParams();
+        dadosFormulario.append('usuario', inputUsuario.value);
+        dadosFormulario.append('senha', inputSenha.value);
+
+        console.log('Enviando dados para o Spring...');
+
+        fetch('/login-spring', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: dadosFormulario
+        })
+        .then(response => {
+            console.log('Resposta recebida do servidor. Status:', response.status);
+            console.log('Redirecionado pelo servidor?', response.redirected);
+
+            // Cenário 1: Se o Spring Security autenticou e mandou redirecionar
+            if (response.redirected) {
+                console.log('Redirecionando para:', response.url);
+                window.location.href = response.url;
+                return;
+            }
+
+            // Cenário 2: Se a resposta foi OK (Status 200), força a ida para o Dashboard
+            if (response.ok) {
+                window.location.href = '/caixa/dashboard';
+                return;
+            }
+
+            // Cenário 3: Se caiu em erro (401 Não Autorizado, 403, etc)
+            throw new Error('Falha na autenticação. Status: ' + response.status);
+        })
+        .catch(error => {
+            console.error('Erro capturado no fluxo de login:', error);
+            
+            // DESTRAVA O BOTÃO SE DER ERRO
+            mensagemErro.textContent = 'Usuário ou senha incorretos ou erro de conexão.';
+            mensagemErro.classList.remove('hidden');
+            btnEntrar.disabled = false;
+            btnEntrar.innerHTML = `Continuar <i class='bx bx-right-arrow-alt text-2xl'></i>`;
         });
-    </script>
+    });
+</script>
+
 
 </body>
-</html>
+</html>onst i

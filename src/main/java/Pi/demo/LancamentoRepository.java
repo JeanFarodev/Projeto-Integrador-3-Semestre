@@ -15,5 +15,9 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
     // Buscar por empresa em um período de datas
     List<Lancamento> findByEmpresaIdAndDataBetween(Long empresaId, LocalDate inicio, LocalDate fim);
+
+    
+    List<Lancamento> findTop5ByEmpresaIdOrderByDataDesc(Long empresaId);
+
 }
 
