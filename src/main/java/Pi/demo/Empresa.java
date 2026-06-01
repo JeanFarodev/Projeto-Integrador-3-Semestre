@@ -3,6 +3,7 @@ package Pi.demo;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "empresa")
 public class Empresa {
 
 

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.*;
 
 @Controller
@@ -28,6 +27,9 @@ public class CaixaController {
 
     @Autowired
     private EmpresaRepository empresaRepository;
+
+    @Autowired
+    private ContabilidadeService contabilidadeService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -61,38 +63,32 @@ public class CaixaController {
     public String abrirLogin() {
         return "login";
     }
+
+    @GetMapping("/home")
+    public String redirecionarFixo() {
+        return "redirect:/caixa/dashboard";
+    }
+
     
-    // 🟢 UNIFICADO: Removeu o método duplicado menor que causava tela vazia
-    @GetMapping({"/dashboard", "/caixa/dashboard"})
+    @GetMapping("/caixa/dashboard")
     public String abrirDashboard(Model model) {
-        List<Empresa> empresas = new ArrayList<>();
-        try {
-            empresas = empresaRepository.findAll();
-        } catch (Exception e) {
-            System.out.println("Aviso: Tabela empresa não encontrada ou vazia.");
-        }
+        List<Empresa> empresas = empresaRepository.findAll();
+        // Se a lista estiver vazia, cria uma empresa temporária em memória para não quebrar a tela
+        Empresa empresaAtual = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : new Empresa();
         
-        Empresa empresaAtual = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : null;
-        String nomeEmpresaReal = (empresaAtual != null && empresaAtual.getNome() != null) ? empresaAtual.getNome() : "Lumina Café & Co.";
+        String nomeEmpresaReal = empresaAtual.getNome() != null ? empresaAtual.getNome() : "Lumina Café & Co.";
+        Long idEmpresaReal = empresaAtual.getId() != null ? empresaAtual.getId() : 1L;
         
-        // Se houver empresa, usa o ID dela; caso contrário, usa null para evitar buscar id falso
-        Long idEmpresaReal = (empresaAtual != null) ? empresaAtual.getId() : null;
-        
-        RegimeTributario regime = (empresaAtual != null && empresaAtual.getRegimeTributario() != null) 
+        RegimeTributario regime = empresaAtual.getRegimeTributario() != null 
                 ? empresaAtual.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
 
-        List<Lancamento> todosLancamentos = new ArrayList<>();
-        try {
-            todosLancamentos = lancamentoRepository.findAll();
-        } catch (Exception e) {
-            System.out.println("Aviso: Tabela lancamento vazia ou não encontrada.");
-        }
+        List<Lancamento> todosLancamentos = lancamentoRepository.findAll();
 
         BigDecimal totalReceitas = BigDecimal.ZERO;
         BigDecimal totalDespesas = BigDecimal.ZERO;
         BigDecimal totalDono = BigDecimal.ZERO;
 
-        if (todosLancamentos != null && !todosLancamentos.isEmpty()) {
+        if (todosLancamentos != null) {
             totalReceitas = todosLancamentos.stream()
                     .map(Lancamento::getValor)
                     .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
@@ -102,38 +98,15 @@ public class CaixaController {
                     .map(Lancamento::getValor)
                     .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
                     .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
-
-            totalDono = todosLancamentos.stream()
-                    .filter(l -> l.getValor() != null && l.getCategoria() != null && l.getCategoria().getNome() != null)
-                    .filter(l -> {
-                        String nomeCat = l.getCategoria().getNome().toUpperCase();
-                        return nomeCat.contains("SÓCIO") || nomeCat.contains("DONO") || 
-                               nomeCat.contains("RETIRADA") || nomeCat.contains("LABORE");
-                    })
-                    .map(Lancamento::getValor)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
         }
 
         BigDecimal saldoAtual = totalReceitas.subtract(totalDespesas);
         BigDecimal impostoEstimado = calcularImposto(totalReceitas, totalDespesas, regime);
 
-        BigDecimal percentualDono = BigDecimal.ZERO;
-        if (totalReceitas.compareTo(BigDecimal.ZERO) > 0) {
-            percentualDono = totalDono.multiply(new BigDecimal("100"))
-                    .divide(totalReceitas, 2, java.math.RoundingMode.HALF_UP);
-        }
-        if (percentualDono.compareTo(new BigDecimal("100")) > 0) {
-            percentualDono = new BigDecimal("100");
-        }
-
-        // Busca os últimos lançamentos de forma segura
-        List<Lancamento> ultimosLancamentos = new ArrayList<>();
-        if (idEmpresaReal != null) {
-            try {
-                ultimosLancamentos = lancamentoRepository.findTop5ByEmpresaIdOrderByDataDesc(idEmpresaReal);
-            } catch (Exception e) {
-                System.out.println("Erro ao buscar top 5 lançamentos: " + e.getMessage());
-            }
+        // Força a busca trazendo os últimos lançamentos de forma absoluta
+        List<Lancamento> ultimosLancamentos = lancamentoRepository.findTop5ByEmpresaIdOrderByDataDesc(idEmpresaReal);
+        if (ultimosLancamentos == null || ultimosLancamentos.isEmpty()) {
+            ultimosLancamentos = todosLancamentos != null ? todosLancamentos : new ArrayList<>();
         }
 
         model.addAttribute("nomeEmpresa", nomeEmpresaReal); 
@@ -141,13 +114,17 @@ public class CaixaController {
         model.addAttribute("totalDespesas", totalDespesas);
         model.addAttribute("saldoAtual", saldoAtual);
         model.addAttribute("impostoEstimado", impostoEstimado);
-        model.addAttribute("movimentacoes", ultimosLancamentos != null ? ultimosLancamentos : new ArrayList<>());
+        model.addAttribute("movimentacoes", ultimosLancamentos);
         model.addAttribute("totalDono", totalDono);
-        model.addAttribute("percentualDono", percentualDono);
+        
+        // Adiciona o ID da empresa para consistência nos links da navbar
+        if (empresaAtual.getId() != null) {
+            model.addAttribute("empresaId", empresaAtual.getId());
+        }
 
         return "dashboard"; 
     }
-    
+
     @GetMapping("/caixa/novo")
     public String exibirFormularioNovoLancamento(Model model) {
         List<Empresa> empresas = empresaRepository.findAll();
@@ -189,12 +166,38 @@ public class CaixaController {
         return "redirect:/caixa/dashboard";
     }
 
-    @GetMapping("/caixa/categorias")
+  @GetMapping("/caixa/categorias")
     public String listarCategoriasTela(Model model) {
-        List<Empresa> empresas = empresaRepository.findAll();
-        String nomeEmpresaReal = (empresas != null && !empresas.isEmpty()) ? empresas.get(0).getNome() : "Lumina Café & Co.";
+        List<Empresa> empresas = new ArrayList<>();
+        try {
+            empresas = empresaRepository.findAll();
+        } catch (Exception e) {
+            System.out.println("Aviso: Falha ao buscar empresas em categorias.");
+        }
+        
+        Empresa empresa = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : new Empresa();
+        String nomeEmpresaReal = empresa.getNome() != null ? empresa.getNome() : "Lumina Café & Co.";
+        
+        List<Categoria> categoriasDoBanco = new ArrayList<>();
+        try {
+            categoriasDoBanco = categoriaRepository.findAll();
+        } catch (Exception e) {
+            System.out.println("Aviso: Erro de conexão com a tabela categoria.");
+        }
+        
+        // 🟢 FILTRO DE SEGURANÇA: Remove qualquer categoria que tenha nome ou tipo nulos antes de mandar pro HTML
+        List<Categoria> categoriasValidas = new ArrayList<>();
+        if (categoriasDoBanco != null) {
+            for (Categoria cat : categoriasDoBanco) {
+                if (cat != null && cat.getNome() != null && cat.getTipo() != null) {
+                    categoriasValidas.add(cat);
+                }
+            }
+        }
+        
         model.addAttribute("nomeEmpresa", nomeEmpresaReal);
-        model.addAttribute("listaCategorias", categoriaRepository.findAll());
+        model.addAttribute("listaCategorias", categoriasValidas);
+        
         return "categorias"; 
     }
 
@@ -241,88 +244,109 @@ public class CaixaController {
     }
 
 
-    @GetMapping("/caixa/relatorios")
-public String abrirRelatorios(Model model) {
-    List<Empresa> empresas = empresaRepository.findAll();
-    Empresa empresaAtual = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : null;
-    
-    String nomeEmpresaReal = (empresaAtual != null && empresaAtual.getNome() != null) ? empresaAtual.getNome() : "Lumina Café & Co.";
-    Long idEmpresaReal = (empresaAtual != null) ? empresaAtual.getId() : 1L;
-    
-    // 🟢 BLINDAGEM: Garante que o regime nunca seja nulo
-    RegimeTributario regime = (empresaAtual != null && empresaAtual.getRegimeTributario() != null) 
-            ? empresaAtual.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
+  @GetMapping("/caixa/relatorios")
+    public String abrirRelatorios(Model model) {
+        List<Empresa> empresas = empresaRepository.findAll();
+        // Se a lista estiver vazia, cria uma empresa temporária em memória para não quebrar o layout
+        Empresa empresaAtual = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : new Empresa();
+        
+        String nomeEmpresaReal = empresaAtual.getNome() != null ? empresaAtual.getNome() : "Lumina Café & Co.";
+        Long idEmpresaReal = empresaAtual.getId() != null ? empresaAtual.getId() : null;
+        
+        RegimeTributario regime = empresaAtual.getRegimeTributario() != null 
+                ? empresaAtual.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
 
-    List<Lancamento> todosLancamentos = lancamentoRepository.findAll();
+        List<Lancamento> todosLancamentos = lancamentoRepository.findAll();
 
-    BigDecimal totalReceitas = todosLancamentos.stream()
-            .map(Lancamento::getValor)
-            .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalReceitas = BigDecimal.ZERO;
+        BigDecimal totalDespesas = BigDecimal.ZERO;
 
-    BigDecimal totalDespesas = todosLancamentos.stream()
-            .map(Lancamento::getValor)
-            .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
-            .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+        if (todosLancamentos != null) {
+            totalReceitas = todosLancamentos.stream()
+                    .map(Lancamento::getValor)
+                    .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    BigDecimal saldoAtual = totalReceitas.subtract(totalDespesas);
-    BigDecimal impostoEstimado = calcularImposto(totalReceitas, totalDespesas, regime);
+            totalDespesas = todosLancamentos.stream()
+                    .map(Lancamento::getValor)
+                    .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+        }
 
-    List<Lancamento> ultimosLancamentos = lancamentoRepository.findTop5ByEmpresaIdOrderByDataDesc(idEmpresaReal);
+        BigDecimal saldoAtual = totalReceitas.subtract(totalDespesas);
+        BigDecimal impostoEstimado = calcularImposto(totalReceitas, totalDespesas, regime);
 
-    model.addAttribute("nomeEmpresa", nomeEmpresaReal); 
-    model.addAttribute("totalReceitas", totalReceitas);
-    model.addAttribute("totalDespesas", totalDespesas);
-    model.addAttribute("saldoAtual", saldoAtual);
-    model.addAttribute("impostoEstimado", impostoEstimado);
-    model.addAttribute("movimentacoes", ultimosLancamentos);
-    model.addAttribute("regimeTributario", regime != null ? regime.name() : "SIMPLES_NACIONAL"); // 🟢 Seguro contra NullPointer
+        // Busca os últimos lançamentos de forma totalmente segura baseada no ID persistido
+        List<Lancamento> ultimosLancamentos = new ArrayList<>();
+        if (idEmpresaReal != null) {
+            try {
+                ultimosLancamentos = lancamentoRepository.findTop5ByEmpresaIdOrderByDataDesc(idEmpresaReal);
+            } catch (Exception e) {
+                System.out.println("Erro ao buscar top 5 lançamentos nos relatórios: " + e.getMessage());
+            }
+        }
+        
+        // Fallback: se der erro ou vier vazio, espelha a lista geral (com proteção contra null)
+        if (ultimosLancamentos == null || ultimosLancamentos.isEmpty()) {
+            ultimosLancamentos = todosLancamentos != null ? todosLancamentos : new ArrayList<>();
+        }
 
-    List<Map<String, String>> relatorios = Arrays.asList(
-        Map.of("titulo", "Fechamentos do Mês", "descricao", "Resumo de todos os fechamentos de caixa dos últimos 30 dias."),
-        Map.of("titulo", "Fluxo de Caixa", "descricao", "Relatório detalhado de entradas e saídas."),
-        Map.of("titulo", "Produtos Mais Vendidos", "descricao", "Ranking de produtos com maior saída no período.")
-    );
-    model.addAttribute("listaRelatorios", relatorios);
+        model.addAttribute("nomeEmpresa", nomeEmpresaReal); 
+        model.addAttribute("totalReceitas", totalReceitas);
+        model.addAttribute("totalDespesas", totalDespesas);
+        model.addAttribute("saldoAtual", saldoAtual);
+        model.addAttribute("impostoEstimado", impostoEstimado);
+        model.addAttribute("movimentacoes", ultimosLancamentos);
+        model.addAttribute("regimeTributario", regime.name().replace("_", " ")); 
 
-    return "relatorios";
-}
+        List<Map<String, String>> relatorios = Arrays.asList(
+            Map.of("titulo", "Fechamentos do Mês", "descricao", "Resumo de todos os fechamentos de caixa dos últimos 30 dias."),
+            Map.of("titulo", "Fluxo de Caixa", "descricao", "Relatório detalhado de entradas e saídas."),
+            Map.of("titulo", "Produtos Mais Vendidos", "descricao", "Ranking de produtos com maior saída no período.")
+        );
+        model.addAttribute("listaRelatorios", relatorios);
 
-    @GetMapping("/caixa/tributacao")
-public String abrirTributacao(Model model) {
-    List<Empresa> empresas = empresaRepository.findAll();
-    Empresa empresa = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : null;
-    
-    // 🟢 BLINDAGEM: Garante que o regime nunca seja nulo ao chamar o método do Enum
-    RegimeTributario regime = (empresa != null && empresa.getRegimeTributario() != null) 
-            ? empresa.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
+        return "relatorios";
+    }
 
-    List<Lancamento> todos = lancamentoRepository.findAll();
-    BigDecimal faturamentoMensal = todos.stream()
-            .map(Lancamento::getValor)
-            .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+   @GetMapping("/caixa/tributacao")
+    public String abrirTributacao(Model model) {
+        List<Empresa> empresas = empresaRepository.findAll();
+        Empresa empresa = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : new Empresa();
+        
+        RegimeTributario regime = empresa.getRegimeTributario() != null 
+                ? empresa.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
 
-    BigDecimal totalDespesas = todos.stream()
-            .map(Lancamento::getValor)
-            .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
-            .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+        List<Lancamento> todos = lancamentoRepository.findAll();
+        BigDecimal faturamentoMensal = BigDecimal.ZERO;
+        BigDecimal totalDespesas = BigDecimal.ZERO;
 
-    BigDecimal impostoSimples = faturamentoMensal.multiply(new BigDecimal("0.06"));
-    BigDecimal impostoPresumido = faturamentoMensal.multiply(new BigDecimal("0.1333"));
-    BigDecimal impostoAtual = calcularImposto(faturamentoMensal, totalDespesas, regime);
+        if (todos != null) {
+            faturamentoMensal = todos.stream()
+                    .map(Lancamento::getValor)
+                    .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) > 0)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    BigDecimal saldoAtual = faturamentoMensal.subtract(totalDespesas);
+            totalDespesas = todos.stream()
+                    .map(Lancamento::getValor)
+                    .filter(v -> v != null && v.compareTo(BigDecimal.ZERO) < 0)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+        }
 
-    model.addAttribute("nomeEmpresa", (empresa != null && empresa.getNome() != null) ? empresa.getNome() : "Lumina Café & Co.");
-    model.addAttribute("faturamento", faturamentoMensal);
-    model.addAttribute("regimeAtual", regime != null ? regime.name() : "Simples Nacional"); // 🟢 Seguro contra NullPointer
-    model.addAttribute("impostoSimples", impostoSimples);
-    model.addAttribute("impostoPresumido", impostoPresumido);
-    model.addAttribute("saldoPosImposto", saldoAtual.subtract(impostoAtual));
+        BigDecimal impostoSimples = faturamentoMensal.multiply(new BigDecimal("0.06"));
+        BigDecimal impostoPresumido = faturamentoMensal.multiply(new BigDecimal("0.1333"));
+        BigDecimal impostoAtual = calcularImposto(faturamentoMensal, totalDespesas, regime);
+        BigDecimal saldoAtual = faturamentoMensal.subtract(totalDespesas);
 
-    return "tributacao";
-}
+        model.addAttribute("nomeEmpresa", empresa.getNome() != null ? empresa.getNome() : "Lumina Café & Co.");
+        model.addAttribute("faturamento", faturamentoMensal);
+        model.addAttribute("regimeAtual", regime.name().replace("_", " ")); 
+        model.addAttribute("impostoSimples", impostoSimples);
+        model.addAttribute("impostoPresumido", impostoPresumido);
+        model.addAttribute("saldoPosImposto", saldoAtual.subtract(impostoAtual));
+
+        return "tributacao";
+    }
 
 
 
