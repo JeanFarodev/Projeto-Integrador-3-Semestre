@@ -27,7 +27,7 @@
                     <a th:href="@{/caixa/tributacao}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
                         <span>⚖️</span> <span>Inteligência Fiscal</span>
                     </a>
-                    <a th:href=@{/caixa/categorias} class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
+                    <a th:href="@{/caixa/categorias}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
                         <span>🏷️</span> <span>Categorias</span>
                     </a>
                     <a th:href="@{/caixa/relatorios}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-medium shadow-sm">
@@ -37,67 +37,76 @@
                         <span>⚙️</span> <span>Configurações</span>
                     </a>
                     <a th:href="@{/caixa/sobre}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition group">
-        <span>ℹ️</span> <span>Sobre o Projeto</span>
-    </a>
+                        <span>ℹ️</span> <span>Sobre o Projeto</span>
+                    </a>
                 </nav>
             </div>
             
-           <div class="pt-4 border-t border-slate-800">
-    <form th:action="@{/logout}" method="POST" class="w-full">
-        <button type="submit" 
-                class="flex items-center justify-center space-x-2 w-full px-4 py-2.5 rounded-lg bg-red-950/40 text-red-400 hover:bg-red-900 hover:text-white font-medium transition group text-sm border border-red-900/30 cursor-pointer">
-            <span>🚪</span>
-            <span>Sair do sistema</span>
-        </button>
-    </form>
-</div>
+            <div class="pt-4 border-t border-slate-800">
+                <form th:action="@{/logout}" method="POST" class="w-full">
+                    <button type="submit" 
+                            class="flex items-center justify-center space-x-2 w-full px-4 py-2.5 rounded-lg bg-red-950/40 text-red-400 hover:bg-red-900 hover:text-white font-medium transition group text-sm border border-red-900/30 cursor-pointer">
+                        <span>🚪</span>
+                        <span>Sair do sistema</span>
+                    </button>
+                </form>
+            </div>
         </aside>
 
         <main class="flex-1 p-8 overflow-y-auto flex flex-col gap-6">
             <header>
-                <h2 class="text-2xl font-bold text-slate-900">Emissão de Relatórios Gerenciais</h2>
-                <p class="text-sm text-slate-500">Gere e exporte relatórios dinâmicos analíticos utilizando a base de dados em tempo real.</p>
+                <h2 class="text-2xl font-bold text-slate-900">Módulo de Business Intelligence</h2>
+                <p class="text-sm text-slate-500">Gere e exporte relatórios analíticos estruturados com validação jurídica baseada na base de dados.</p>
             </header>
             
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-                <h3 class="font-bold text-slate-900 text-lg mb-6">Painel de Exportação</h3>
+                <h3 class="font-bold text-slate-900 text-lg mb-6">Painel de Exportação de Documentos Oficiais</h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     
-                    <div class="border border-slate-200 p-5 rounded-xl hover:border-blue-500 hover:shadow-md transition bg-white flex flex-col justify-between h-44">
+                    <div class="border border-slate-200 p-6 rounded-xl hover:border-blue-500 hover:shadow-md transition bg-white flex flex-col justify-between h-52 shadow-xs">
                         <div>
-                            <h4 class="font-bold text-slate-900 text-base">Demonstração de Fluxo de Caixa</h4>
-                            <p class="text-sm text-slate-500 mt-2 line-clamp-2">Balanço geral consolidando receitas totais, despesas operacionais, saldo líquido e provisão de tributos (6%).</p>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="p-2 rounded-lg bg-emerald-50 text-emerald-600 font-bold text-lg">🏦</span>
+                                <h4 class="font-bold text-slate-900 text-base">Demonstração do Fluxo de Caixa</h4>
+                            </div>
+                            <p class="text-xs text-slate-500 leading-relaxed">Balanço corporativo consolidando receitas brutas, custos de operação, saldo líquido e provisões fiscais unificadas.</p>
                         </div>
                         <div class="pt-4 border-t border-slate-100 flex justify-end">
                             <button th:onclick="gerarPdfFluxo([[${nomeEmpresa}]], [[${totalReceitas}]], [[${totalDespesas}]], [[${saldoAtual}]], [[${impostoEstimado}]])" 
-                                    class="text-blue-600 text-sm font-semibold hover:text-blue-800 flex items-center gap-1.5 cursor-pointer transition">
-                                📄 <span>Exportar DFC</span>
+                                    class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded-lg tracking-wide shadow-xs cursor-pointer transition">
+                                📄 Exportar DFC
                             </button>
                         </div>
                     </div>
 
-                    <div class="border border-slate-200 p-5 rounded-xl hover:border-blue-500 hover:shadow-md transition bg-white flex flex-col justify-between h-44">
+                    <div class="border border-slate-200 p-6 rounded-xl hover:border-blue-500 hover:shadow-md transition bg-white flex flex-col justify-between h-52 shadow-xs">
                         <div>
-                            <h4 class="font-bold text-slate-900 text-base">Extrato Analítico de Lançamentos</h4>
-                            <p class="text-sm text-slate-500 mt-2 line-clamp-2">Auditoria detalhada contendo o histórico das últimas movimentações processadas no sistema.</p>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="p-2 rounded-lg bg-blue-50 text-blue-600 font-bold text-lg">🔍</span>
+                                <h4 class="font-bold text-slate-900 text-base">Extrato Analítico Geral</h4>
+                            </div>
+                            <p class="text-xs text-slate-500 leading-relaxed">Livro Razão completo contendo a trilha de auditoria detalhada de todas as movimentações financeiras no banco.</p>
                         </div>
                         <div class="pt-4 border-t border-slate-100 flex justify-end">
-                            <button id="btnExtrato" class="text-blue-600 text-sm font-semibold hover:text-blue-800 flex items-center gap-1.5 cursor-pointer transition">
-                                📄 <span>Exportar Extrato</span>
+                            <button id="btnExtrato" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded-lg tracking-wide shadow-xs cursor-pointer transition">
+                                📄 Exportar Extrato
                             </button>
                         </div>
                     </div>
 
-                    <div class="border border-slate-200 p-5 rounded-xl hover:border-blue-500 hover:shadow-md transition bg-white flex flex-col justify-between h-44">
+                    <div class="border border-slate-200 p-6 rounded-xl hover:border-blue-500 hover:shadow-md transition bg-white flex flex-col justify-between h-52 shadow-xs">
                         <div>
-                            <h4 class="font-bold text-slate-900 text-base">Diagnóstico de Saúde Fiscal</h4>
-                            <p class="text-sm text-slate-500 mt-2 line-clamp-2">Análise inteligente baseada no regime tributário e margem de lucro operacional.</p>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="p-2 rounded-lg bg-orange-50 text-orange-600 font-bold text-lg">⚖️</span>
+                                <h4 class="font-bold text-slate-900 text-base">Diagnóstico de Saúde Fiscal</h4>
+                            </div>
+                            <p class="text-xs text-slate-500 leading-relaxed">Análise preditiva baseada em margens de lucro operacionais e regras de enquadramento do Simples Nacional.</p>
                         </div>
                         <div class="pt-4 border-t border-slate-100 flex justify-end">
                             <button th:onclick="gerarDiagnosticoSaude([[${nomeEmpresa}]], [[${totalReceitas}]], [[${totalDespesas}]], [[${saldoAtual}]], [[${regimeTributario}]])" 
-                                    class="text-blue-600 text-sm font-semibold hover:text-blue-800 flex items-center gap-1.5 cursor-pointer transition">
-                                📄 <span>Gerar Diagnóstico</span>
+                                    class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded-lg tracking-wide shadow-xs cursor-pointer transition">
+                                📄 Gerar Diagnóstico
                             </button>
                         </div>
                     </div>
@@ -108,194 +117,190 @@
     </div>
 
     <script th:inline="javascript">
-        // 1. GERAR PDF DO FLUXO DE CAIXA CONSOLIDADO
+        const movimentacoesReais = /*[[${movimentacoes}]]*/ [];
+        const empresaNome = /*[[${nomeEmpresa}]]*/ "TechFlow Soluções Inteligentes";
+
+        // Função utilitária para desenhar o topo corporativo em todas as páginas do PDF
+        function desenharCabecalhoCorporativo(doc, tituloDocumento) {
+            const dataAtual = new Date().toLocaleString('pt-BR');
+            // Faixa Superior Escura (Estilo Slate-950)
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 210, 38, "F");
+            
+            // Textos do Cabeçalho
+            doc.setFontSize(18); doc.setTextColor(96, 165, 250); doc.setFont("Helvetica", "bold");
+            doc.text("LOGOS BUSINESS INTELLIGENCE", 15, 16);
+            
+            doc.setFontSize(11); doc.setTextColor(255, 255, 255); doc.setFont("Helvetica", "normal");
+            doc.text(tituloDocumento, 15, 24);
+            
+            doc.setFontSize(8); doc.setTextColor(148, 163, 184);
+            doc.text("Emitido em: " + dataAtual, 145, 16);
+            doc.text("Status: Documento Oficial Auditado", 145, 22);
+        }
+
+        // 1. RELATÓRIO: DEMONSTRAÇÃO DO FLUXO DE CAIXA (DFC)
         function gerarPdfFluxo(empresa, receitas, despesas, saldo, imposto) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const dataAtual = new Date().toLocaleString('pt-BR');
+            
+            desenharCabecalhoCorporativo(doc, "Demonstração de Fluxo de Caixa (DFC) Consolidado");
 
-            // Cabeçalho Estrutural
-            doc.setFontSize(18); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "bold");
-            doc.text("LOGOS — RELATÓRIO GERENCIAL", 20, 25);
-            doc.setFontSize(11); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
-            doc.text("Demonstração de Fluxo de Caixa (Consolidado)", 20, 32);
-            doc.setDrawColor(15, 23, 42); doc.setLineWidth(0.5); doc.line(20, 36, 190, 36);
+            doc.setFontSize(11); doc.setTextColor(30, 41, 59); doc.setFont("Helvetica", "bold");
+            doc.text("DADOS DA ORGANIZAÇÃO", 15, 50);
+            doc.setFont("Helvetica", "normal"); doc.setTextColor(71, 85, 105);
+            doc.text("Razão Social: " + empresa, 15, 56);
+            doc.text("Escopo Contábil: Fluxo de Caixa Mensal Unificado", 15, 62);
+            doc.line(15, 66, 195, 66);
 
-            // Dados da Entidade
-            doc.setFontSize(12); doc.setTextColor(51, 65, 85); doc.setFont("Helvetica", "bold");
-            doc.text("Empresa Auditada: " + empresa, 20, 48);
+            // Tabela Estruturada de Demonstração
+            let y = 76;
+            doc.setFont("Helvetica", "bold"); doc.setTextColor(255, 255, 255); doc.setFillColor(30, 41, 59);
+            doc.rect(15, y, 180, 8, "F");
+            doc.text("CONTA CONTÁBIL / FLUXO OPERACIONAL", 18, y + 6);
+            doc.text("VALOR INTEGRAL", 145, y + 6);
+
+            // Linhas Zebradas da DRE
+            const linhas = [
+                { t: "(+) Receitas Operacionais Brutas", v: receitas, c: [22, 163, 74] },
+                { t: "(-) Despesas e Custos de Operação", v: -despesas, c: [220, 38, 38] },
+                { t: "(-) Provisão Simples Nacional (Alíquota Inicial 6%)", v: -imposto, c: [220, 38, 38] }
+            ];
+
+            y += 8;
             doc.setFont("Helvetica", "normal");
-            doc.text("Período de Apuração: Competência Mensal Vigente", 20, 54);
+            linhas.forEach((l, idx) => {
+                if (idx % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y, 180, 9, "F"); }
+                doc.setTextColor(51, 65, 85);
+                doc.text(l.t, 18, y + 6);
+                doc.setFont("Helvetica", "bold"); doc.setTextColor(l.c[0], l.c[1], l.c[2]);
+                doc.text("R$ " + Number(l.v).toLocaleString('pt-BR', {minimumFractionDigits: 2}), 145, y + 6);
+                doc.setFont("Helvetica", "normal");
+                y += 9;
+            });
 
-            // Quadro Indicador Financeiro
-            doc.setDrawColor(226, 232, 240); doc.setFillColor(248, 250, 252);
-            doc.rect(20, 64, 170, 65, "FD");
-
-            doc.setFont("Helvetica", "bold"); doc.setTextColor(30, 41, 59);
-            doc.text("INDICADORES FINANCEIROS", 25, 74);
-            doc.line(25, 77, 185, 77);
-
-            doc.setFont("Helvetica", "normal");
-            doc.text("(+) Receitas Operacionais Brutas:", 25, 87);
-            doc.text("R$ " + Number(receitas).toLocaleString('pt-BR', {minimumFractionDigits: 2}), 130, 87);
-
-            doc.text("(-) Despesas / Custos de Operação:", 25, 95);
-            doc.text("R$ " + Number(despesas).toLocaleString('pt-BR', {minimumFractionDigits: 2}), 130, 95);
-
-            doc.text("(=) Provisão Simples Nacional (6%):", 25, 103);
-            doc.text("R$ " + Number(imposto).toLocaleString('pt-BR', {minimumFractionDigits: 2}), 130, 103);
-
-            doc.line(25, 109, 185, 109);
+            // Linha de Fechamento / Totalizador
+            doc.setFillColor(241, 245, 249); doc.rect(15, y, 180, 10, "F");
             doc.setFont("Helvetica", "bold"); doc.setTextColor(37, 99, 235);
-            doc.text("(=) Saldo Líquido de Caixa Disponível:", 25, 119);
-            doc.text("R$ " + Number(saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2}), 130, 119);
+            doc.text("(=) SALDO LÍQUIDO DISPONÍVEL EM CAIXA", 18, y + 7);
+            doc.text("R$ " + Number(saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2}), 145, y + 7);
 
-            // Assinatura e Notas
-            doc.setFontSize(10); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
-            doc.text("Parecer Técnico: Os dados acima refletem fielmente as transações armazenadas.", 20, 145);
-            doc.line(60, 185, 150, 185);
-            doc.text("Assinatura do Responsável pelo Caixa", 78, 190);
+            // Campo de Assinatura Auditada
+            doc.setFontSize(9); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
+            doc.text("Documento gerado através de persistência relacional estável e livre de inconsistências fiscais.", 15, y + 30);
+            doc.line(55, y + 65, 155, y + 65);
+            doc.text("Assinatura Eletrônica do Diretor Financeiro", 75, y + 70);
 
-            // Metadados Rodapé
-            doc.setFontSize(8); doc.text("Gerado em: " + dataAtual + " | Cód. Autenticador: PI-JPA-" + Math.floor(Math.random() * 10000), 20, 285);
             doc.save("DFC_" + empresa.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() + ".pdf");
         }
 
-        // 2. CAPTURAR E GERAR PDF DO EXTRATO DE LANÇAMENTOS
-        const movimentacoesReais = /*[[${movimentacoes}]]*/ [];
-        const empresaNome = /*[[${nomeEmpresa}]]*/ "";
-
+        // 2. RELATÓRIO: EXTRATO ANALÍTICO (LIVRO RAZÃO EM TABELA)
         document.getElementById("btnExtrato").addEventListener("click", function() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const dataAtual = new Date().toLocaleString('pt-BR');
+            
+            desenharCabecalhoCorporativo(doc, "Extrato Analítico Geral de Movimentações");
 
-            // Cabeçalho
-            doc.setFontSize(18); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "bold");
-            doc.text("LOGOS — EXTRATO DE CONTAS", 20, 25);
-            doc.setFontSize(11); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
-            doc.text("Histórico Analítico de Movimentações Recentes (" + empresaNome + ")", 20, 32);
-            doc.setDrawColor(15, 23, 42); doc.setLineWidth(0.5); doc.line(20, 36, 190, 36);
+            let y = 48;
+            doc.setFontSize(10); doc.setFont("Helvetica", "bold"); doc.setTextColor(255, 255, 255); doc.setFillColor(30, 41, 59);
+            doc.rect(15, y, 180, 9, "F");
+            doc.text("DATA", 18, y + 6);
+            doc.text("DESCRIÇÃO DO LANÇAMENTO OPERACIONAL", 45, y + 6);
+            doc.text("VALOR (R$)", 155, y + 6);
+            y += 9;
 
-            // Cabeçalho da Tabela Manual no PDF
-            let y = 50;
-            doc.setFontSize(10); doc.setFont("Helvetica", "bold"); doc.setTextColor(51, 65, 85);
-            doc.text("DATA", 20, y);
-            doc.text("DESCRIÇÃO DO LANÇAMENTO", 45, y);
-            doc.text("VALOR LIQUIDO", 155, y);
-            doc.line(20, y+3, 190, y+3);
-            y += 11;
-
-            doc.setFont("Helvetica", "normal"); doc.setTextColor(71, 85, 105);
+            doc.setFont("Helvetica", "normal");
 
             if (!movimentacoesReais || movimentacoesReais.length === 0) {
-                doc.text("Nenhum lançamento contábil processado até o momento.", 20, y);
+                doc.setTextColor(100, 116, 139);
+                doc.text("Nenhum lançamento contábil processado até o momento no banco.", 18, y + 6);
             } else {
-                movimentacoesReais.forEach((item) => {
-                    if (y > 260) { doc.addPage(); y = 30; }
+                movimentacoesReais.forEach((item, index) => {
+                    if (y > 270) { doc.addPage(); y = 45; desenharCabecalhoCorporativo(doc, "Extrato Analítico Geral de Movimentações (Continuação)"); doc.setFontSize(10); }
 
+                    // Linhas zebradas para dar aspecto de relatório real de ERP
+                    if (index % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y, 180, 9, "F"); }
+
+                    doc.setTextColor(51, 65, 85);
                     const dataFormatada = item.data ? item.data.split("-").reverse().join("/") : "##/##/####";
-                    doc.text(dataFormatada, 20, y);
-                    doc.text(item.descricao, 45, y);
+                    doc.text(dataFormatada, 18, y + 6);
+                    doc.text(item.descricao, 45, y + 6);
                     
-                    const v = Number(item.valor);
-                    if (v < 0) {
-                        doc.setTextColor(220, 38, 38);
-                    } else {
-                        doc.setTextColor(22, 163, 74);
-                    }
-                    doc.text("R$ " + v.toLocaleString('pt-BR', {minimumFractionDigits: 2}), 155, y);
+                    const val = Number(item.valor);
+                    if (val < 0) { doc.setTextColor(220, 38, 38); } else { doc.setTextColor(22, 163, 74); }
+                    doc.setFont("Helvetica", "bold");
+                    doc.text(val.toLocaleString('pt-BR', {minimumFractionDigits: 2}), 155, y + 6);
+                    doc.setFont("Helvetica", "normal");
                     
-                    doc.setTextColor(71, 85, 105);
-                    y += 8;
+                    y += 9;
                 });
             }
 
-            // Metadados Rodapé
-            doc.setFontSize(8); doc.setTextColor(148, 163, 184);
-            doc.text("Documento auditado e emitido de forma automatizada em: " + dataAtual, 20, 285);
             doc.save("extrato_" + empresaNome.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() + ".pdf");
         });
 
-        // 3. GERAR DIAGNÓSTICO DE SAÚDE FISCAL
+        // 3. RELATÓRIO: DIAGNÓSTICO DE SAÚDE FISCAL
         function gerarDiagnosticoSaude(empresa, receitas, despesas, saldo, regime) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const dataAtual = new Date().toLocaleString('pt-BR');
-
-            // Cabeçalho
-            doc.setFontSize(18); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "bold");
-            doc.text("SISTEMA LOGOS — AUDITORIA FISCAL", 20, 25);
-            doc.setFontSize(10); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
-            doc.text("Relatório de Diagnóstico de Saúde e Planejamento Tributário", 20, 32);
-            doc.setDrawColor(15, 23, 42); doc.setLineWidth(0.5); doc.line(20, 36, 190, 36);
-
-            // Identificação da Empresa
-            doc.setFontSize(11); doc.setTextColor(51, 65, 85); doc.setFont("Helvetica", "bold");
-            doc.text("Organização: " + empresa, 20, 46);
             
-            let txtRegime = "Não Informado";
-            if (regime === "SIMPLES_NACIONAL") txtRegime = "Simples Nacional";
-            if (regime === "MEI") txtRegime = "Microempreendedor Individual (MEI)";
+            desenharCabecalhoCorporativo(doc, "Auditoria e Parecer de Inteligência Fiscal");
+
+            let txtRegime = "Simples Nacional";
             if (regime === "LUCRO_PRESUMIDO") txtRegime = "Lucro Presumido";
-            if (regime === "LUCRO_REAL") txtRegime = "Lucro Real";
 
-            doc.text("Regime Tributário Ativo: " + txtRegime, 20, 52);
-            doc.line(20, 56, 190, 56);
+            doc.setFontSize(11); doc.setTextColor(30, 41, 59); doc.setFont("Helvetica", "bold");
+            doc.text("ANÁLISE E PARÂMETROS FISCAIS DE ENQUADRAMENTO", 15, 50);
+            doc.setFont("Helvetica", "normal"); doc.setTextColor(71, 85, 105);
+            doc.text("Razão Social: " + empresa, 15, 56);
+            doc.text("Regime Tributário Identificado: " + txtRegime, 15, 62);
+            doc.line(15, 66, 195, 66);
 
-            // Lógica do Parecer Financeiro
             let statusSaude = "SAUDÁVEL";
             let parecerTexto = "";
+            let colorParecer = [22, 163, 74]; // Verde
             const margemLucro = receitas > 0 ? (saldo / receitas) * 100 : 0;
 
             if (saldo < 0) {
-                statusSaude = "CRÍTICO (DÉFICIT OPERACIONAL)";
+                statusSaude = "ALERTA CRÍTICO: DÉFICIT OPERACIONAL";
+                colorParecer = [220, 38, 38]; // Vermelho
                 parecerTexto = "A empresa apresenta um saldo de caixa negativo no período analisado. Significa que os custos operacionais superaram a geração de receitas. Recomenda-se cortar gastos não essenciais e renegociar prazos de fornecedores antes de gerar as guias tributárias mensais.";
             } else if (margemLucro < 15) {
-                statusSaude = "ATENÇÃO (MARGEM DE SEGURANÇA BAIXA)";
-                parecerTexto = "A operação encontra-se estável, porém a margem de lucro líquido está abaixo de 15%. Qualquer aumento imprevisto em custos fiscais comprometerá o capital de giro. Ação imediata: auditar despesas operacionais da aba de caixa.";
+                statusSaude = "ATENÇÃO: MARGEM DE SEGURANÇA BAIXA";
+                colorParecer = [234, 88, 12]; // Laranja
+                parecerTexto = "A operação encontra-se estável, porém a margem de lucro líquido está abaixo do limite ideal de 15%. Qualquer aumento imprevisto em custos fiscais comprometerá o capital de giro. Ação imediata: auditar despesas operacionais da aba de caixa.";
             } else {
-                statusSaude = "EXCELENTE (SAÚDE FINANCEIRA COMPROVADA)";
-                parecerTexto = "A empresa demonstra ótima eficiência, com controle rígido sobre o fluxo de despesas. O caixa gerado suporta as obrigações do regime tributário atual e permite investimentos futuros.";
+                statusSaude = "EXCELENTE: SAÚDE FINANCEIRA COMPROVADA";
+                parecerTexto = "A empresa demonstra ótima eficiência operacional, com controle rígido sobre o fluxo de despesas. O caixa gerado suporta as obrigações do regime tributário atual e garante liquidez para novos investimentos em tecnologia.";
             }
 
-            // Caixa de Destaque
-            doc.setFillColor(241, 245, 249); doc.rect(20, 63, 170, 14, "F");
-            doc.setFont("Helvetica", "bold"); doc.setTextColor(37, 99, 235);
-            doc.text("DIAGNÓSTICO DA OPERAÇÃO: " + statusSaude, 24, 72);
+            // Caixa de Destaque do Resultado
+            doc.setFillColor(241, 245, 249); doc.rect(15, 73, 180, 14, "F");
+            doc.setFont("Helvetica", "bold"); doc.setTextColor(colorParecer[0], colorParecer[1], colorParecer[2]);
+            doc.text(statusSaude, 19, 82);
 
-            // Parecer Técnico
-            doc.setFontSize(11); doc.setTextColor(15, 23, 42); doc.text("Análise Crítica do Fluxo de Caixa:", 20, 90);
+            // Parecer Escrito com Quebra Automatizada
+            doc.setFontSize(11); doc.setTextColor(15, 23, 42); doc.text("Parecer do Auditor de Inteligência Comercial:", 15, 100);
             doc.setFont("Helvetica", "normal"); doc.setTextColor(51, 65, 85);
-            const parecerQuebrado = doc.splitTextToSize(parecerTexto, 170);
-            doc.text(parecerQuebrado, 20, 97);
+            const parecerQuebrado = doc.splitTextToSize(parecerTexto, 178);
+            doc.text(parecerQuebrado, 15, 107);
 
-            // Diretriz de Planejamento Tributário
-            let yPos = 97 + (parecerQuebrado.length * 6) + 12;
+            // Diretriz Fiscal Avançada
+            let yPos = 107 + (parecerQuebrado.length * 6) + 12;
             doc.setFont("Helvetica", "bold"); doc.setTextColor(15, 23, 42);
-            doc.text("Diretriz de Planejamento Tributário:", 20, yPos);
+            doc.text("Diretriz de Planejamento Tributário para o Próximo Período:", 15, yPos);
             
             yPos += 7;
             doc.setFont("Helvetica", "normal"); doc.setTextColor(51, 65, 85);
             
-            let recomendacaoFiscal = "Monitore as movimentações brutas de receitas para evitar desenquadramentos fiscais indesejados ao fim do ano letivo.";
-            
-            if (regime === "MEI") {
-                recomendacaoFiscal = "Atenção ao limite anual do MEI (R$ 81.000,00). Com faturamento atualizado, certifique-se de que a média mensal não ultrapasse R$ 6.750,00 para evitar a migração retroativa e obrigatória para o Simples Nacional.";
-            } else if (regime === "SIMPLES_NACIONAL") {
-                recomendacaoFiscal = "Sua alíquota base estimada está inserida na faixa inicial. Monitore a receita bruta acumulada dos últimos 12 meses. Caso ultrapasse o teto da primeira faixa, o sistema calculará o imposto com a alíquota progressiva efetiva.";
-            } else if (regime === "LUCRO_PRESUMIDO" || regime === "LUCRO_REAL") {
-                recomendacaoFiscal = "Regime de tributação geral corporativo. Recomenda-se realizar uma auditoria rigorosa de créditos tributários sobre insumos e despesas operacionais registradas no LOGOS para fins de abatimento de IRPJ e CSLL.";
-            }
+            let recomendacaoFiscal = "Sua alíquota base de software está enquadrada na faixa inicial unificada do Simples Nacional. Monitore a receita bruta acumulada dos últimos 12 meses. Caso ultrapasse o teto da primeira faixa de faturamento, o sistema calculará o imposto progressivo efetivo baseado no Anexo III.";
 
-            const recQuebrada = doc.splitTextToSize(recomendacaoFiscal, 170);
-            doc.text(recQuebrada, 20, yPos);
+            const recQuebrada = doc.splitTextToSize(recomendacaoFiscal, 178);
+            doc.text(recQuebrada, 15, yPos);
 
-            // Rodapé
+            // Rodapé Institucional
             doc.setFontSize(8); doc.setTextColor(148, 163, 184);
-            doc.text("Documento de auditoria automatizado em: " + dataAtual, 20, 285);
-            doc.text("LOGOS Business Intelligence v1.0", 140, 285);
-
+            doc.text("Diagnóstico de Auditoria emitido pelo Core Engine LOGOS.", 15, 285);
             doc.save("Diagnostico_Saude_" + empresa.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() + ".pdf");
         }
     </script>
