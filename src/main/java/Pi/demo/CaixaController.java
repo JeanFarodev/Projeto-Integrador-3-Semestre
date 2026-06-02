@@ -46,6 +46,20 @@ public class CaixaController {
     }
 
     
+    @GetMapping("/caixa/sobre")
+public String abrirSobre(Model model, Principal principal) {
+    // Busca as empresas para puxar o nome dinâmico da cadastrada
+    List<Empresa> empresas = empresaRepository.findAll();
+    Empresa empresaAtual = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : new Empresa();
+    String nomeEmpresaReal = empresaAtual.getNome() != null ? empresaAtual.getNome() : "Lumina Café & Co.";
+    
+    // Envia o nome da empresa para o Thymeleaf renderizar
+    model.addAttribute("nomeEmpresa", nomeEmpresaReal);
+    
+    return "sobre"; // Renderiza o template sobre.html que está em templates
+}
+
+
     @GetMapping("/caixa/dashboard")
     public String abrirDashboard(Model model, Principal principal) {
         List<Empresa> empresas = empresaRepository.findAll();
