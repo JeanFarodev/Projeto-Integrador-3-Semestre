@@ -31,10 +31,14 @@
     <div class="bg-white p-10 rounded-2xl shadow-md w-full max-w-md border border-slate-100 mx-4">
         
         <div class="flex flex-col items-center justify-center mb-8 text-primary">
-            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <i class='bx bx-laptop text-4xl'></i>
+            <!-- Logo com link curto -->
+            <div class="w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center mb-4 overflow-hidden">
+                <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663610107160/RCrOONKKWPVeQvFE.png" 
+                     alt="Logo LOGOS" class="w-20 h-20 object-contain">
             </div>
-            <h1 class="text-2xl font-bold text-slate-800">Acesso ao Sistema</h1>
+            
+            <h1 class="text-3xl font-extrabold text-primary">LOGOS</h1>
+            
             <p class="text-slate-500 text-sm mt-1">Insira suas credenciais para continuar</p>
         </div>
 
@@ -84,57 +88,42 @@
     const mensagemErro = document.getElementById('mensagemErro');
     const btnEntrar = document.getElementById('btnEntrar');
     
-    // Captura as chaves do token de segurança CSRF geradas dinamicamente pelo Thymeleaf
     const csrfToken = document.getElementById('csrfToken').value;
     const csrfHeader = document.getElementById('csrfHeader').value;
 
     form.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        // Bloqueia cliques contínuos durante o processamento da requisição
         btnEntrar.disabled = true;
         btnEntrar.innerHTML = `<i class='bx bx-loader-alt bx-spin text-2xl'></i> Verificando...`;
         mensagemErro.classList.add('hidden');
 
         const dadosFormulario = new URLSearchParams();
-        // 🟢 ATUALIZADO: Passa as chaves exatas de mapeamento do AuthenticationProvider
         dadosFormulario.append('username', inputUsuario.value);
         dadosFormulario.append('password', inputSenha.value);
 
-        console.log('Enviando dados estruturados para o Spring Security...');
-
-        // O endpoint padrão de captura do Spring Security costuma ser '/login' processado via POST
         fetch('/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                [csrfHeader]: csrfToken // 🟢 INJEÇÃO CRÍTICA: Envia o token CSRF no header para evitar erro 403 Forbidden
+                [csrfHeader]: csrfToken
             },
             body: dadosFormulario
         })
         .then(response => {
-            console.log('Resposta recebida. Status:', response.status);
-
-            // Se o Spring Security autenticou com sucesso, ele faz o redirecionamento automático
             if (response.redirected) {
-                console.log('Redirecionando usuário autenticado para:', response.url);
                 window.location.href = response.url;
                 return;
             }
 
-            // Se retornar status OK ou cair no sucesso da rota padrão, direciona pro Dashboard unificado
             if (response.ok) {
                 window.location.href = '/caixa/dashboard';
                 return;
             }
 
-            // Se o status for 401 (Unauthorized), significa credenciais inválidas
-            throw new Error('Falha na autenticação do sistema. Status: ' + response.status);
+            throw new Error('Falha na autenticação');
         })
         .catch(error => {
-            console.error('Erro interceptado no fluxo de autenticação:', error);
-            
-            // Destrava os botões e injeta o alerta
             mensagemErro.textContent = 'Usuário ou senha incorretos.';
             mensagemErro.classList.remove('hidden');
             btnEntrar.disabled = false;

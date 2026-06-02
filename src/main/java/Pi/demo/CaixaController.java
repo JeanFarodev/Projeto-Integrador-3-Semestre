@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 @Controller
@@ -33,31 +34,6 @@ public class CaixaController {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-
-    // 🟢 AUXILIAR: MOTOR TRIBUTÁRIO DINÂMICO DO LOGOS
-    private BigDecimal calcularImposto(BigDecimal receitas, BigDecimal despesas, RegimeTributario regime) {
-        if (regime == null) {
-            return receitas.multiply(new BigDecimal("0.06")); // Fallback 6%
-        }
-        switch (regime) {
-            case MEI:
-                // MEI paga taxa fixa mensal independente do faturamento
-                return receitas.compareTo(BigDecimal.ZERO) > 0 ? new BigDecimal("75.00") : BigDecimal.ZERO;
-            case SIMPLES_NACIONAL:
-                return receitas.multiply(new BigDecimal("0.06")); // 6%
-            case LUCRO_PRESUMIDO:
-                return receitas.multiply(new BigDecimal("0.1333")); // 13.33%
-            case LUCRO_REAL:
-                // Lucro Real tributa 15% sobre o Lucro Líquido (Receitas - Despesas)
-                BigDecimal lucroLiquido = receitas.subtract(despesas);
-                if (lucroLiquido.compareTo(BigDecimal.ZERO) > 0) {
-                    return lucroLiquido.multiply(new BigDecimal("0.15"));
-                }
-                return BigDecimal.ZERO; // Isento se deu prejuízo
-            default:
-                return receitas.multiply(new BigDecimal("0.06"));
-        }
-    }
 
     @GetMapping({"/", "/login"})
     public String abrirLogin() {
@@ -82,7 +58,7 @@ public class CaixaController {
         RegimeTributario regime = empresaAtual.getRegimeTributario() != null 
                 ? empresaAtual.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
 
-        List<Lancamento> todosLancamentos = lancamentoRepository.findAll();
+        List<Lancamento> todosLancamentos = lancamentoRepository.findByEmpresaId(idEmpresaReal);
 
         BigDecimal totalReceitas = BigDecimal.ZERO;
         BigDecimal totalDespesas = BigDecimal.ZERO;
@@ -101,7 +77,7 @@ public class CaixaController {
         }
 
         BigDecimal saldoAtual = totalReceitas.subtract(totalDespesas);
-        BigDecimal impostoEstimado = calcularImposto(totalReceitas, totalDespesas, regime);
+        BigDecimal impostoEstimado = contabilidadeService.calcularImpostoAutomatico(totalReceitas, saldoAtual, empresaAtual);
 
         // Força a busca trazendo os últimos lançamentos de forma absoluta
         List<Lancamento> ultimosLancamentos = lancamentoRepository.findTop5ByEmpresaIdOrderByDataDesc(idEmpresaReal);
@@ -144,6 +120,10 @@ public class CaixaController {
                 lancamento.setEmpresa(empresas.get(0));
             }
             
+            if (lancamento.getData() == null) {
+                lancamento.setData(LocalDate.now());
+            }
+
             if (lancamento.getCategoria() != null && lancamento.getCategoria().getId() != null) {
                 categoriaRepository.findById(lancamento.getCategoria().getId()).ifPresent(cat -> {
                     if ("DESPESA".equalsIgnoreCase(cat.getTipo())) {
@@ -166,7 +146,7 @@ public class CaixaController {
         return "redirect:/caixa/dashboard";
     }
 
-  @GetMapping("/caixa/categorias")
+    @GetMapping("/caixa/categorias")
     public String listarCategoriasTela(Model model) {
         List<Empresa> empresas = new ArrayList<>();
         try {
@@ -180,12 +160,13 @@ public class CaixaController {
         
         List<Categoria> categoriasDoBanco = new ArrayList<>();
         try {
+            // Busca as categorias atualizadas (incluindo as que foram salvas pelo PostMapping)
             categoriasDoBanco = categoriaRepository.findAll();
         } catch (Exception e) {
             System.out.println("Aviso: Erro de conexão com a tabela categoria.");
         }
         
-        // 🟢 FILTRO DE SEGURANÇA: Remove qualquer categoria que tenha nome ou tipo nulos antes de mandar pro HTML
+        // 🟢 FILTRO DE SEGURANÇA: Remove qualquer categoria inválida antes de mandar pro HTML
         List<Categoria> categoriasValidas = new ArrayList<>();
         if (categoriasDoBanco != null) {
             for (Categoria cat : categoriasDoBanco) {
@@ -195,10 +176,12 @@ public class CaixaController {
             }
         }
         
+        // Passa os dados necessários para o Thymeleaf renderizar
         model.addAttribute("nomeEmpresa", nomeEmpresaReal);
         model.addAttribute("listaCategorias", categoriasValidas);
         
-         return "redirect:/caixa/categorias"; 
+        // Retorna o arquivo correto 'categorias.html' na raiz de templates
+        return "categorias"; 
     }
 
     @PostMapping("/caixa/categorias/salvar")
@@ -256,7 +239,7 @@ public class CaixaController {
         RegimeTributario regime = empresaAtual.getRegimeTributario() != null 
                 ? empresaAtual.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
 
-        List<Lancamento> todosLancamentos = lancamentoRepository.findAll();
+        List<Lancamento> todosLancamentos = idEmpresaReal != null ? lancamentoRepository.findByEmpresaId(idEmpresaReal) : new ArrayList<>();
 
         BigDecimal totalReceitas = BigDecimal.ZERO;
         BigDecimal totalDespesas = BigDecimal.ZERO;
@@ -274,7 +257,7 @@ public class CaixaController {
         }
 
         BigDecimal saldoAtual = totalReceitas.subtract(totalDespesas);
-        BigDecimal impostoEstimado = calcularImposto(totalReceitas, totalDespesas, regime);
+        BigDecimal impostoEstimado = contabilidadeService.calcularImpostoAutomatico(totalReceitas, saldoAtual, empresaAtual);
 
         // Busca os últimos lançamentos de forma totalmente segura baseada no ID persistido
         List<Lancamento> ultimosLancamentos = new ArrayList<>();
@@ -317,7 +300,7 @@ public class CaixaController {
         RegimeTributario regime = empresa.getRegimeTributario() != null 
                 ? empresa.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
 
-        List<Lancamento> todos = lancamentoRepository.findAll();
+        List<Lancamento> todos = empresa.getId() != null ? lancamentoRepository.findByEmpresaId(empresa.getId()) : new ArrayList<>();
         BigDecimal faturamentoMensal = BigDecimal.ZERO;
         BigDecimal totalDespesas = BigDecimal.ZERO;
 
@@ -335,7 +318,7 @@ public class CaixaController {
 
         BigDecimal impostoSimples = faturamentoMensal.multiply(new BigDecimal("0.06"));
         BigDecimal impostoPresumido = faturamentoMensal.multiply(new BigDecimal("0.1333"));
-        BigDecimal impostoAtual = calcularImposto(faturamentoMensal, totalDespesas, regime);
+        BigDecimal impostoAtual = contabilidadeService.calcularImpostoAutomatico(faturamentoMensal, faturamentoMensal.subtract(totalDespesas), empresa);
         BigDecimal saldoAtual = faturamentoMensal.subtract(totalDespesas);
 
         model.addAttribute("nomeEmpresa", empresa.getNome() != null ? empresa.getNome() : "Lumina Café & Co.");

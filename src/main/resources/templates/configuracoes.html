@@ -10,7 +10,12 @@
     <div class="flex h-screen">
         <aside class="w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0">
             <div>
-                <div class="mb-8">
+                <div class="mb-8 flex flex-col items-start">
+                    <!-- Logo no topo preservando o h1 e p originais -->
+                    <div class="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center mb-3 overflow-hidden">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663610107160/RCrOONKKWPVeQvFE.png" 
+                             alt="Logo LOGOS" class="w-12 h-12 object-contain">
+                    </div>
                     <h1 class="text-xl font-bold tracking-wider text-blue-400">LOGOS</h1>
                     <p class="text-xs text-slate-400" th:text="${nomeEmpresa}">Nome da Empresa</p>
                 </div>
@@ -34,10 +39,14 @@
             </div>
             <div class="pt-4 border-t border-slate-800">
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-bold text-sm text-white">VG</div>
+                    <!-- Logo no perfil preservando o VG e o nome originais -->
+                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden border border-slate-700">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663610107160/RCrOONKKWPVeQvFE.png" 
+                             alt="Avatar LOGOS" class="w-8 h-8 object-contain">
+                    </div>
                     <div>
                         <p class="text-sm font-medium text-slate-200">Vinicius Gama</p>
-                        <a href="/logout" class="text-xs text-red-400 hover:underline">Sair do sistema</a>
+                       <a href="/logout" class="text-xs text-red-400 hover:underline">Sair do sistema</a>
                     </div>
                 </div>
             </div>
