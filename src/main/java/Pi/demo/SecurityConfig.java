@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .loginProcessingUrl("/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .defaultSuccessUrl("/caixa/dashboard", true)
+                .defaultSuccessUrl("/caixa/sobre", true)
                 .permitAll()
             )
             .logout(logout -> logout
