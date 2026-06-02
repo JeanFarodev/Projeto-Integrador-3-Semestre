@@ -8,17 +8,19 @@
 <body class="bg-slate-50 text-slate-800 font-sans">
 
     <div class="flex h-screen">
+        <!-- BARRA LATERAL (SIDEBAR) -->
         <aside class="w-64 bg-slate-950 text-white p-6 flex flex-col shrink-0">
             <div class="flex-1">
                 <div class="mb-8 flex flex-col items-start">
-                    <!-- Logo no topo preservando o h1 e p originais -->
-                    <div class="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center mb-3 overflow-hidden">
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663610107160/RCrOONKKWPVeQvFE.png" 
-                             alt="Logo LOGOS" class="w-12 h-12 object-contain">
+                    <!-- AJUSTE: Fundo redondo, efeito blur e caminho local híbrido idêntico ao login -->
+                    <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-3 overflow-hidden backdrop-blur-xs">
+                        <img src="../static/img/logo.png" th:src="@{/img/logo.png}" alt="Logo LOGOS" class="w-full h-full object-cover">
                     </div>
                     <h1 class="text-xl font-bold tracking-wider text-blue-400">LOGOS</h1>
                     <p class="text-xs text-slate-400" th:text="${nomeEmpresa}">Nome da Empresa</p>
                 </div>
+                
+                <!-- Menu de Navegação -->
                 <nav class="space-y-2">
                     <a th:href="@{/caixa/dashboard}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
                         <span>📊</span> <span>Dashboard</span>
@@ -38,27 +40,26 @@
                 </nav>
             </div>
 
-            <div class="pt-4 border-t border-slate-800">
-                <div class="flex items-center space-x-3">
-                    <!-- Logo no perfil preservando o VG e o nome originais -->
-                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden border border-slate-700">
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663610107160/RCrOONKKWPVeQvFE.png" 
-                             alt="Avatar LOGOS" class="w-8 h-8 object-contain">
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-slate-200">LOGOS</p>
-                        <a href="/logout" class="text-xs text-red-400 hover:underline">Sair do sistema</a>
-                    </div>
-                </div>
-            </div>
+            <!-- RODAPÉ DA SIDEBAR: Apenas o Botão de Logout -->
+          <div class="pt-4 border-t border-slate-800">
+    <form th:action="@{/logout}" method="POST" class="w-full">
+        <button type="submit" 
+                class="flex items-center justify-center space-x-2 w-full px-4 py-2.5 rounded-lg bg-red-950/40 text-red-400 hover:bg-red-900 hover:text-white font-medium transition group text-sm border border-red-900/30 cursor-pointer">
+            <span>🚪</span>
+            <span>Sair do sistema</span>
+        </button>
+    </form>
+</div>
         </aside>
 
+        <!-- CONTEÚDO PRINCIPAL -->
         <main class="flex-1 p-8 overflow-y-auto">
             <header class="mb-8">
                 <h2 class="text-2xl font-bold text-slate-900">Decisão Tributária & Impacto</h2>
                 <p class="text-sm text-slate-500">Comparativo real baseado no seu faturamento e regime atual.</p>
             </header>
 
+            <!-- Cards Resumo de Indicadores -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <p class="text-xs font-bold text-slate-400 uppercase">Receita Bruta Acumulada</p>
@@ -74,6 +75,7 @@
                 </div>
             </div>
 
+            <!-- Bloco Comparativo de Eficiência -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-6 border-b border-slate-100 flex justify-between items-center">
                     <h3 class="font-bold text-slate-900">Comparativo de Eficiência Fiscal</h3>
@@ -108,6 +110,7 @@
                         </div>
                     </div>
 
+                    <!-- Alerta Dinâmico de Viabilidade -->
                     <div class="mt-10 p-5 rounded-xl border" 
                          th:classappend="${regimeAtual == 'SIMPLES NACIONAL' or regimeAtual == 'MEI'} ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'">
                         <div class="flex gap-4">

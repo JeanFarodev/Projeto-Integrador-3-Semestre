@@ -25,7 +25,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.ignoringRequestMatchers("/login", "/logout")) 
             .authorizeHttpRequests(auth -> auth
                 // Permite o acesso livre para as páginas e recursos essenciais
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/login", "/cadastro", "/registrar").permitAll()
+                .requestMatchers("/css/**","/img/**", "/js/**", "/images/**", "/login", "/cadastro", "/registrar","/webjars/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -37,10 +37,12 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout=true")
-                .permitAll()
-            );
+            .logoutUrl("/logout") 
+            .logoutSuccessUrl("/login?logout") 
+            .invalidateHttpSession(true) 
+            .clearAuthentication(true) 
+            .permitAll()
+        );
 
         return http.build();
     }

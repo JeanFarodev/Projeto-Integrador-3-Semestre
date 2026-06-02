@@ -11,14 +11,13 @@
         <aside class="w-64 bg-slate-950 text-white p-6 flex flex-col shrink-0">
             <div class="flex-1">
                 <div class="mb-8 flex flex-col items-start">
-                    <!-- Logo integrada no Dashboard -->
-                    <div class="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center mb-3 overflow-hidden">
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663610107160/RCrOONKKWPVeQvFE.png" 
-                             alt="Logo LOGOS" class="w-12 h-12 object-contain">
+                    <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-3 overflow-hidden backdrop-blur-xs">
+                        <img src="../static/img/logo.png" th:src="@{/img/logo.png}" alt="Logo LOGOS" class="w-full h-full object-cover">
                     </div>
                     <h1 class="text-xl font-bold tracking-wider text-blue-400">LOGOS</h1>
                     <p class="text-xs text-slate-400" th:text="${nomeEmpresa}">Nome da Empresa</p>
                 </div>
+                
                 <nav class="space-y-2">
                     <a th:href="@{/caixa/dashboard}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-medium shadow-sm">
                         <span>📊</span> <span>Dashboard</span>
@@ -26,7 +25,7 @@
                     <a th:href="@{/caixa/tributacao}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition group">
                         <span>⚖️</span> <span>Inteligência Fiscal</span>
                     </a>
-                    <a th:href=@{/caixa/categorias} class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition group">
+                    <a th:href="@{/caixa/categorias}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition group">
                         <span>🏷️</span> <span>Categorias</span>
                     </a>
                     <a th:href="@{/caixa/relatorios}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition group">
@@ -38,15 +37,15 @@
                 </nav>
             </div>
 
-            <div class="pt-4 border-t border-slate-800">
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-bold text-sm text-white">VG</div>
-                    <div>
-                        <p class="text-sm font-medium text-slate-200">LOGO</p>
-                        <a href="/logout" class="text-xs text-red-400 hover:underline">Sair do sistema</a>
-                    </div>
-                </div>
-            </div>
+   <div class="pt-4 border-t border-slate-800">
+    <form th:action="@{/logout}" method="POST" class="w-full">
+        <button type="submit" 
+                class="flex items-center justify-center space-x-2 w-full px-4 py-2.5 rounded-lg bg-red-950/40 text-red-400 hover:bg-red-900 hover:text-white font-medium transition group text-sm border border-red-900/30 cursor-pointer">
+            <span>🚪</span>
+            <span>Sair do sistema</span>
+        </button>
+    </form>
+</div>
         </aside>
 
         <main class="flex-1 p-8 overflow-y-auto">

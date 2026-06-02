@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import java.security.Principal;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
@@ -47,9 +47,12 @@ public class CaixaController {
 
     
     @GetMapping("/caixa/dashboard")
-    public String abrirDashboard(Model model) {
+    public String abrirDashboard(Model model, Principal principal) {
         List<Empresa> empresas = empresaRepository.findAll();
-        // Se a lista estiver vazia, cria uma empresa temporária em memória para não quebrar a tela
+        
+        String email = (principal != null) ? principal.getName() : "";
+        Optional<Usuario> usuarioRepoUsuario = usuarioRepository.findByEmail(email);
+
         Empresa empresaAtual = (empresas != null && !empresas.isEmpty()) ? empresas.get(0) : new Empresa();
         
         String nomeEmpresaReal = empresaAtual.getNome() != null ? empresaAtual.getNome() : "Lumina Café & Co.";
@@ -92,6 +95,7 @@ public class CaixaController {
         model.addAttribute("impostoEstimado", impostoEstimado);
         model.addAttribute("movimentacoes", ultimosLancamentos);
         model.addAttribute("totalDono", totalDono);
+        model.addAttribute("usuarioLogado", usuarioRepoUsuario.orElse(new Usuario()));
         
         // Adiciona o ID da empresa para consistência nos links da navbar
         if (empresaAtual.getId() != null) {
