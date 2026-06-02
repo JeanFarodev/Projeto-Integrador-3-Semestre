@@ -20,14 +20,24 @@ public class ContabilidadeService {
      * Ele decide se usa a lógica de PF ou PJ baseado no Enum da Empresa.
      */
     public BigDecimal calcularImpostoAutomatico(BigDecimal receitas, BigDecimal saldo, Empresa empresa) {
-        if (empresa == null || empresa.getTipoPessoa() == null) return BigDecimal.ZERO;
-
-        if (empresa.getTipoPessoa() == TipoPessoa.PF) {
-            return calcularIRPF(saldo);
-        } else {
-            return calcularImpostoPJ(receitas, saldo, empresa.getRegimeTributario());
-        }
+    // Se a empresa for nula, assume o padrão PJ - Simples Nacional para não zerar a tela
+    if (empresa == null) {
+        return calcularImpostoPJ(receitas, saldo, RegimeTributario.SIMPLES_NACIONAL);
     }
+    
+    // Se o tipo de pessoa não foi definido, assume PJ por padrão
+    TipoPessoa tipo = (empresa.getTipoPessoa() != null) ? empresa.getTipoPessoa() : TipoPessoa.PJ;
+    
+    if (tipo == TipoPessoa.PF) {
+        return calcularIRPF(saldo);
+    } else {
+        // Se o regime estiver nulo, assume SIMPLES_NACIONAL como padrão
+        RegimeTributario regime = (empresa.getRegimeTributario() != null) 
+                ? empresa.getRegimeTributario() : RegimeTributario.SIMPLES_NACIONAL;
+                
+        return calcularImpostoPJ(receitas, saldo, regime);
+    }
+}
 
     /**
      * Lógica para Pessoa Física (Tabela Progressiva)
@@ -55,6 +65,14 @@ public class ContabilidadeService {
             if (saldo.signum() <= 0) return BigDecimal.ZERO;
             return saldo.multiply(ALIQUOTA_LUCRO_REAL).setScale(2, RoundingMode.HALF_UP);
         }
+
+        if (RegimeTributario.valueOf("MEI") == regime) {
+        return new BigDecimal("80.00"); // Taxa fixa padrão do MEI
+    }
+
+    if (RegimeTributario.valueOf("LUCRO_PRESUMIDO") == regime) {
+        return receitas.multiply(new BigDecimal("0.1333")).setScale(2, RoundingMode.HALF_UP);
+    }
 
         return BigDecimal.ZERO;
     }
